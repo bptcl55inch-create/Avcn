@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medical English ER</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Inter',sans-serif}@keyframes pulse-border{0%,100%{box-shadow:0 0 0 0 rgba(59,130,246,.4)}50%{box-shadow:0 0 0 6px rgba(59,130,246,0)}}.xray-blank{animation:pulse-border 2s infinite}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}.shake{animation:shake .3s ease-in-out 2}@keyframes popIn{0%{transform:scale(.95);opacity:0}100%{transform:scale(1);opacity:1}}.pop-in{animation:popIn .25s ease-out forwards}
+</style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen">
+<div class="max-w-4xl mx-auto p-4 sm:p-6">
+<div id="sync-warning-banner" class="mb-4 p-3.5 sm:p-4 rounded-2xl bg-amber-100 dark:bg-amber-950/80 border-2 border-amber-400 dark:border-amber-600 text-amber-950 dark:text-amber-100 shadow-sm flex items-center justify-between gap-3">
+<div class="flex items-center gap-2.5 text-xs sm:text-sm font-bold leading-snug">
+<span class="text-xl shrink-0">⚠️</span>
+<span>Lưu ý phải đồng bộ trước khi tắt web, nếu ko bạn là 1 thằng đần tên Quân</span>
+</div>
+<button type="button" onclick="openCloudModal()" class="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs">☁️ Đồng bộ ngay</button>
+</div>
+<header class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm mb-5">
+<div class="flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center text-2xl">🩺</div>
+<div><h1 class="text-lg sm:text-xl font-bold">Medical English ER</h1><p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Phản xạ Từ loại · Đuôi từ & Thì Y khoa</p></div>
+</div>
+<div class="flex flex-wrap items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-xl text-xs">
+<span>Chuỗi:</span><b id="streak-count" class="text-base text-amber-500">🔥 0</b><span>|</span>
+<span>XP:</span><b id="xp-count" class="text-base text-emerald-600 dark:text-emerald-400">0</b><span>|</span>
+<span>Tốc độ:</span><b id="speed-count" class="text-blue-600 dark:text-blue-400">--s/câu</b>
+</div>
+</div>
+<div class="mt-3.5 pt-3.5 border-t border-slate-100 dark:border-slate-800">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+<div class="flex items-center gap-2"><span class="text-xs font-semibold text-slate-500">Cảnh giới:</span><span id="rank-badge" class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-blue-600 text-white">Con Người</span></div>
+<div class="flex flex-wrap items-center gap-2"><span id="save-status" class="text-[11px] text-emerald-600 font-medium">💾 Đã tự lưu</span><button type="button" onclick="openCloudModal()" class="text-[11px] px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-medium">☁️ Đồng bộ máy khác</button><button type="button" onclick="resetSavedProgress()" class="text-[11px] px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-600">Xóa lưu</button></div>
+</div>
+<div id="rank-ladder" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1.5 text-[11px]"></div>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+<button type="button" onclick="switchTab('xray')" id="tab-xray" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 text-white">🔬 Soi X-Quang</button>
+<button type="button" onclick="switchTab('quiz')" id="tab-quiz" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">⚡ Cấp Cứu (Quiz)</button>
+<button type="button" onclick="switchTab('vocab')" id="tab-vocab" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">🗂️ Kho Từ & Bẫy</button>
+</div>
+</header>
+
+<section id="view-xray" class="pop-in space-y-4">
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+<span class="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-lg">Chạm từ màu vàng để soi tín hiệu</span>
+<div class="flex items-center gap-2"><span id="xray-counter" class="text-xs text-slate-400">Ca 1 / 8</span><button type="button" onclick="nextXray(-1)" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">← Trước</button><button type="button" onclick="nextXray(1)" class="p-2 rounded-lg bg-slate-900 dark:bg-slate-700 text-white text-xs">Tiếp →</button></div>
+</div>
+<div id="xray-sentence-box" class="p-5 rounded-2xl bg-slate-900 text-slate-100 text-base sm:text-xl leading-relaxed font-medium border border-slate-700"></div>
+<div id="xray-analysis" class="mt-4 p-4 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60"></div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+<div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800"><b class="text-blue-600 block mb-1">1. DANH TỪ (N)</b>Sau <code>a/the/your</code>, Adj. Đuôi: <b>-tion, -ment, -ist, -ure, -itis</b></div>
+<div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800"><b class="text-emerald-600 block mb-1">2. TÍNH TỪ (Adj)</b>Trước N, sau <code>be/feel/appear</code>. Đuôi: <b>-al, -ed, -ive, -ous, -ble</b></div>
+<div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800"><b class="text-amber-600 block mb-1">3. TRẠNG TỪ (Adv)</b>Cạnh V thường, đầu câu + phẩy. Đuôi: <b>-ly</b> (<i>lately, likely</i>)</div>
+<div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800"><b class="text-purple-600 block mb-1">4. ĐỘNG TỪ (V)</b>Sau S, <code>will/can/to</code>. Đuôi: <b>-ate, -ize, -fy, -en</b></div>
+</div>
+</section>
+
+<section id="view-quiz" class="hidden pop-in">
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+<div class="flex items-center gap-2"><span id="quiz-tag" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">Quiz</span><span id="quiz-progress" class="text-xs text-slate-400">Câu 1</span></div>
+<div class="flex flex-wrap gap-2"><button type="button" id="auto-next-btn" onclick="toggleAutoNext()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">⚡ Tự động chuyển: Bật</button><button type="button" id="auto-renew-btn" onclick="toggleAutoRenew()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">🔄 Tự tạo đề mới: Bật</button><button type="button" onclick="generateOpenQuizBatch(true)" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">🎲 Tạo đề mới</button><button type="button" onclick="document.getElementById('quiz-hint-box').classList.toggle('hidden')" class="text-xs px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">💡 Gợi ý</button></div>
+</div>
+<div id="weak-structure-box" class="mb-4 p-3 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-800/60 flex flex-wrap items-center justify-between gap-2 text-xs"></div>
+<div id="quiz-question" class="text-base sm:text-lg font-medium leading-relaxed p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 mb-3"></div>
+<div id="quiz-hint-box" class="hidden mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs sm:text-sm text-amber-800 dark:text-amber-200"></div>
+<div id="quiz-options" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4"></div>
+<div id="quiz-feedback" class="hidden p-4 rounded-xl text-sm mb-4"></div>
+<div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800"><div class="flex items-center gap-2 relative"><button type="button" id="quiz-prev-btn" onclick="prevQuiz()" class="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold disabled:opacity-40 shrink-0">← Câu trước</button><div class="relative"><button type="button" id="quiz-picker-btn" onclick="toggleQuizPicker()" class="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-700"><span>📋 Câu <span id="quiz-picker-label">1/22</span></span><span class="text-[10px] opacity-70">▾</span></button><div id="quiz-picker-menu" class="hidden absolute bottom-full left-0 mb-2 w-60 p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl z-30"><div class="flex items-center justify-between text-[11px] font-semibold text-slate-400 px-1 pb-2 mb-2 border-b border-slate-100 dark:border-slate-800"><span>Chọn nhanh câu hỏi</span><button type="button" onclick="closeQuizPicker()" class="px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">✕</button></div><div id="quiz-nav-pills" class="grid grid-cols-5 gap-1.5 max-h-56 overflow-y-auto"></div></div></div></div><button type="button" id="quiz-next-btn" onclick="nextQuiz()" class="hidden py-2 px-4 rounded-xl bg-blue-600 text-white text-xs sm:text-sm font-semibold shrink-0">Ca tiếp theo →</button></div>
+</div>
+</section>
+
+<section id="view-vocab" class="hidden pop-in space-y-4">
+<div class="flex flex-wrap gap-2">
+<button type="button" onclick="filterVocab('ALL')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white" data-type="ALL">Tất cả</button>
+<button type="button" onclick="filterVocab('N')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" data-type="N">Danh từ (N)</button>
+<button type="button" onclick="filterVocab('J')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" data-type="J">Tính từ (Adj)</button>
+<button type="button" onclick="filterVocab('A')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" data-type="A">Trạng từ (Adv)</button>
+<button type="button" onclick="filterVocab('V')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" data-type="V">Động từ (V)</button>
+<button type="button" onclick="filterVocab('SURG')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800" data-type="SURG">🔪 Thủ thuật phẫu thuật</button>
+<button type="button" onclick="filterVocab('TRAP')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800" data-type="TRAP">⚠️ Bẫy & Cấu trúc</button>
+</div>
+<div id="vocab-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+</section>
+</div>
+
+<div id="cloud-modal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-5 max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-xl space-y-3">
+<div class="flex items-center justify-between">
+<h2 class="text-base font-bold">☁️ Đồng bộ tiến trình trên nhiều thiết bị</h2>
+<button type="button" onclick="closeCloudModal()" class="text-xs px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800">✕</button>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Nhập biệt danh hoặc mã cá nhân (ví dụ: <code class="font-mono">Vĩ chim to</code>). Dùng chung mã này trên điện thoại và máy tính để lưu và tải lại điểm, chuỗi đúng, tốc độ.</p>
+<input id="cloud-code-input" type="text" placeholder="Nhập mã cá nhân của bạn..." class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none focus:border-blue-500">
+<div class="grid grid-cols-2 gap-2 pt-1">
+<button type="button" onclick="syncSaveToCloud()" class="py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold">⬆️ Lưu lên đám mây</button>
+<button type="button" onclick="syncLoadFromCloud()" class="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold">⬇️ Tải về máy này</button>
+</div>
+<div id="cloud-msg" class="text-xs font-medium text-slate-600 dark:text-slate-300 min-h-[18px]"></div>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+const CLOUD_CODE_KEY = 'avcn_medical_er_v2_cloud_code';
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'avcn-f01b5';
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBt6rROnho7-JBBGtaGrK6iO-rgo4BBsM0",
+  authDomain: "avcn-f01b5.firebaseapp.com",
+  projectId: "avcn-f01b5",
+  storageBucket: "avcn-f01b5.firebasestorage.app",
+  messagingSenderId: "831063574878",
+  appId: "1:831063574878:web:94e06e852fcd5f6981e7cf",
+  measurementId: "G-9GQZ0EDZWM"
+};
+let db = null, auth = null, currentUser = null;
+
+function formatFirebaseError(err) {
+  const code = err?.code || '';
+  if (code === 'auth/configuration-not-found' || code === 'auth/admin-restricted-operation' || code === 'auth/operation-not-allowed') {
+    return 'Chưa bật Anonymous Sign-in trong Firebase Authentication.';
+  }
+  if (code === 'permission-denied') {
+    return 'Firestore từ chối quyền ghi/đọc (kiểm tra Rules trong Firestore Database).';
+  }
+  if (code === 'unavailable' || code === 'failed-precondition') {
+    return 'Chưa khởi tạo Firestore Database hoặc kết nối mạng bị gián đoạn.';
+  }
+  return code ? `Lỗi Firebase (${code}).` : (err?.message || 'Dịch vụ lưu trực tuyến chưa được kích hoạt trong môi trường này.');
+}
+
+async function ensureCloudAuth() {
+  if (currentUser && db) return { user: currentUser, error: null };
+  const rawCfg = typeof __firebase_config !== 'undefined' ? __firebase_config : '';
+  const cfg = rawCfg ? JSON.parse(rawCfg) : DEFAULT_FIREBASE_CONFIG;
+  if (!cfg || !cfg.apiKey) {
+    return { user: null, error: 'Thiếu cấu hình Firebase.' };
+  }
+  const app = getApps().length ? getApps()[0] : initializeApp(cfg);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+    const cred = await signInWithCustomToken(auth, __initial_auth_token);
+    currentUser = cred.user;
+  } else {
+    const cred = await signInAnonymously(auth);
+    currentUser = cred.user;
+  }
+  return { user: currentUser, error: null };
+}
+
+function normalizeCode(raw) {
+  return (raw || '')
+    .normalize('NFC')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '_')
+    .replace(/[^\p{L}\p{N}_-]/gu, '')
+    .slice(0, 48);
+}
+
+function setCloudStatus(text, isError = false) {
+  const el = document.getElementById('cloud-msg');
+  if (!el) return;
+  el.textContent = text;
+  el.className = `text-xs font-medium min-h-[18px] ${isError ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`;
+}
+
+function getProfileDocRef(code) {
+  return doc(db, 'artifacts', appId, 'public', 'data', 'medical_er_profiles', code);
+}
+
+window.openCloudModal = function() {
+  const input = document.getElementById('cloud-code-input');
+  try {
+    const savedCode = localStorage.getItem(CLOUD_CODE_KEY) || '';
+    if (input) input.value = savedCode;
+  } catch (e) {}
+  setCloudStatus('');
+  document.getElementById('cloud-modal').classList.remove('hidden');
+};
+
+window.closeCloudModal = function() {
+  document.getElementById('cloud-modal').classList.add('hidden');
+};
+
+window.syncSaveToCloud = async function() {
+  const code = normalizeCode(document.getElementById('cloud-code-input')?.value);
+  if (!code) {
+    setCloudStatus('Vui lòng nhập mã cá nhân trước khi lưu.', true);
+    return;
+  }
+  setCloudStatus('Đang kết nối và lưu tiến trình...');
+  try {
+    const { user, error } = await ensureCloudAuth();
+    if (!user || !db) {
+      setCloudStatus(error || 'Dịch vụ lưu trực tuyến chưa được kích hoạt trong môi trường này.', true);
+      return;
+    }
+    try { localStorage.setItem(CLOUD_CODE_KEY, code); } catch (e) {}
+    const payload = {
+      code,
+      ownerUid: user.uid,
+      updatedAt: Date.now(),
+      stateJson: JSON.stringify(window.exportProgressSnapshot ? window.exportProgressSnapshot() : {})
+    };
+    await setDoc(getProfileDocRef(code), payload);
+    setCloudStatus(`✅ Đã lưu tiến trình cho mã "${code}".`);
+  } catch (e) {
+    setCloudStatus('❌ ' + formatFirebaseError(e), true);
+  }
+};
+
+window.syncLoadFromCloud = async function() {
+  const code = normalizeCode(document.getElementById('cloud-code-input')?.value);
+  if (!code) {
+    setCloudStatus('Vui lòng nhập mã cá nhân để tải dữ liệu.', true);
+    return;
+  }
+  setCloudStatus('Đang tải dữ liệu từ đám mây...');
+  try {
+    const { user, error } = await ensureCloudAuth();
+    if (!user || !db) {
+      setCloudStatus(error || 'Dịch vụ lưu trực tuyến chưa được kích hoạt trong môi trường này.', true);
+      return;
+    }
+    const snap = await getDoc(getProfileDocRef(code));
+    if (!snap.exists()) {
+      setCloudStatus(`⚠️ Chưa tìm thấy dữ liệu cho mã "${code}".`, true);
+      return;
+    }
+    const data = snap.data();
+    const parsed = data && data.stateJson ? JSON.parse(data.stateJson) : null;
+    if (!parsed || typeof window.importProgressSnapshot !== 'function') {
+      setCloudStatus('⚠️ Dữ liệu đồng bộ không hợp lệ.', true);
+      return;
+    }
+    try { localStorage.setItem(CLOUD_CODE_KEY, code); } catch (e) {}
+    window.importProgressSnapshot(parsed);
+    setCloudStatus(`✅ Đã đồng bộ thành công mã "${code}" lên thiết bị này!`);
+  } catch (e) {
+    setCloudStatus('❌ ' + formatFirebaseError(e), true);
+  }
+};
+</script>
+
+<script>
+const STORAGE_KEY='avcn_medical_er_v2_progress';
+const TIERS=[{name:'Con Người',minXp:0,maxS:Infinity},{name:'Nhân Vật Alime',minXp:1000,maxS:8},{name:'Nhân Vật Bá Khí',minXp:3500,maxS:5.5},{name:'Quỷ S*x',minXp:8000,maxS:3.8},{name:'Đại Thống Khổ',minXp:15000,maxS:2.6},{name:'Hóa Thần Dinh Dưỡng K52',minXp:25000,maxS:1.8}];
+const XRAY=[
+{u:'Unit 15 · Phẫu thuật',m:'Sau mạo từ "the" là Danh từ → operation (ca mổ).',p:[{t:'After '},{t:'the',s:1,c:'Mạo từ "the" trước chỗ trống → cần DANH TỪ.'},{b:1,a:'operation',o:['operate (V)','operation (N)','operative (Adj)']},{t:', you '},{t:'will',s:1,c:'"will + V0" diễn tả sự việc chắc chắn sau mổ.'},{t:' awake in the recovery room.'}]},
+{u:'Unit 10 · Tiêm thuốc',m:'Sau "must" là Động từ nguyên mẫu → administer.',p:[{t:'Nurses '},{t:'must',s:1,c:'Sau "must" dùng ĐỘNG TỪ NGUYÊN MẪU.'},{b:1,a:'administer',o:['administer (V)','administration (N)','administrative (Adj)']},{t:' injections under '},{t:'supervision',s:1,c:'Đuôi -sion là danh từ (sự giám sát).'},{t:'.'}]},
+{u:'Unit 6 · Cấp cứu',m:'Sau linking verb "appears" dùng Tính từ → bruised.',p:[{t:'The patient’s left ankle '},{t:'appears',s:1,c:'"appears" là linking verb → cần TÍNH TỪ.'},{b:1,a:'bruised',o:['bruise (V/N)','bruised (Adj)','bruising (N)']},{t:' and swollen.'}]},
+{u:'Unit 14 · Cấp phát thuốc',m:'Bổ nghĩa động từ "administered" → Trạng từ -ly (orally).',p:[{t:'Oral medications are '},{t:'administered',s:1,c:'Bổ nghĩa cho động từ → cần TRẠNG TỪ -ly.'},{b:1,a:'orally',o:['oral (Adj)','orally (Adv)','orality (N)']},{t:'.'}]},
+{u:'Unit 9 · Hô hấp',m:'Trước danh từ "tubes" cần Tính từ → bronchial.',p:[{t:'Asthma causes narrowing of the '},{b:1,a:'bronchial',o:['bronchus (N)','bronchial (Adj)','bronchitis (N)']},{t:' '},{t:'tubes',s:1,c:'Danh từ "tubes" cần TÍNH TỪ bổ nghĩa phía trước.'},{t:'.'}]},
+{u:'Unit 7 · Chấn thương',m:'Bẫy giả định sau "require that" → be reset (không chia is).',p:[{t:'Compound fractures '},{t:'require that',s:1,c:'Sau "require that" dùng thức giả định: S + be + V3/ed.'},{t:' the bone '},{b:1,a:'be reset',o:['is reset','be reset','was reset']},{t:' before it can heal.'}]},
+{u:'Unit 15 · Tâm lý trước mổ',m:'Cấu trúc "It is + adj + (for sb) + to V0" → to feel.',p:[{t:'It is '},{t:'important',s:1,c:'Mẫu "It is + adj + for sb + to V0".'},{t:' for you '},{b:1,a:'to feel',o:['feeling','to feel','felt']},{t:' calm before the procedure.'}]},
+{u:'Unit 6 · Triệu chứng',m:'"Lately" + "for two days" → Hiện tại hoàn thành (have had).',p:[{t:'Lately, I '},{b:1,a:'have had',o:['had','have had','will have']},{t:' persistent abdominal pains '},{t:'for two days',s:1,c:'"for + khoảng thời gian" → Hiện tại hoàn thành.'},{t:'.'}]}
+];
+const QUIZ=[
+{t:'Vị trí & Đuôi từ',q:'The anesthesiologist will closely _______ the patient’s vital signs.',h:'Sau "will closely" cần ĐỘNG TỪ NGUYÊN MẪU.',o:['monitor','monitoring','monitored','monitors'],a:0,e:'"monitor" sau "will" là động từ nguyên mẫu (theo dõi).'},
+{t:'Bẫy -ed / -ing',q:'After the fall, the athlete’s ankle appeared severely _______.',h:'Sau linking verb "appeared" cần TÍNH TỪ.',o:['swell','swelling','swollen','swells'],a:2,e:'"swollen" (bị sưng) là tính từ đứng sau linking verb.'},
+{t:'Thì Y khoa',q:'The patient _______ persistent pain for three days before coming to the ER.',h:'"for three days" → Hiện tại hoàn thành.',o:['has had','have','will have','having'],a:0,e:'Có "for + thời gian" → dùng Hiện tại hoàn thành (has had).'},
+{t:'Danh từ quá trình',q:'Proper wound care speeds up the _______ process.',h:'Giữa "the" và "process" cần DANH TỪ chỉ quá trình.',o:['heal','healed','healing','healer'],a:2,e:'"healing process" (quá trình lành vết thương).'},
+{t:'Bẫy require that',q:'Comminuted fractures require that the bone _______ repositioned.',h:'Thức giả định sau "require that" → V0 không chia.',o:['is','was','be','being'],a:2,e:'Sau "require that" luôn dùng "be + V3/ed".'},
+{t:'Sau mạo từ',q:'The surgeon made a small _______ above the appendix.',h:'Sau "a small" cần DANH TỪ đếm được.',o:['incise','incision','incisive','incising'],a:1,e:'Đuôi -sion: "incision" (vết rạch mổ).'},
+{t:'Điều kiện Y khoa',q:'If a donor _______ type O negative blood, they are a universal donor.',h:'Mệnh đề If không dùng "will", chia Hiện tại đơn.',o:['will have','has','had','having'],a:1,e:'Vế If chia Hiện tại đơn với chủ ngữ số ít → "has".'},
+{t:'Trạng từ -ly',q:'Antibiotics are typically administered _______ for mild infections.',h:'Bổ nghĩa cho động từ "administered" → TRẠNG TỪ -ly.',o:['oral','orally','orality','orals'],a:1,e:'"orally" (qua đường uống) là trạng từ.'},
+{t:'Tính từ chuyên khoa',q:'Asthma causes narrowing of the _______ tubes.',h:'Trước danh từ "tubes" cần TÍNH TỪ -al.',o:['bronchus','bronchial','bronchitis','bronchi'],a:1,e:'"bronchial tubes" (ống phế quản).'},
+{t:'It is + adj',q:'It is vital for staff _______ sterile equipment during every procedure.',h:'Khung "It is + adj + for sb + to V0".',o:['use','using','to use','used'],a:2,e:'Sau "It is + adj + for sb" dùng "to + V0".'},
+{t:'Động từ -fy',q:'Lab technicians use tests to _______ specific pathogens.',h:'Sau "to" chỉ mục đích → ĐỘNG TỪ V0.',o:['identification','identifiable','identify','identified'],a:2,e:'Đuôi -fy: "identify" (nhận diện).'},
+{t:'Thì tương lai',q:'Post-op recovery _______ regular physical therapy.',h:'Dự báo sau mổ (post-op) → Tương lai đơn.',o:['will involve','involved','involving','was involving'],a:0,e:'Dự báo kế hoạch sau mổ dùng "will + V0".'},
+{t:'Danh từ sau Adj',q:'The nurse observed noticeable _______ around the wrist.',h:'Sau tính từ "noticeable" cần DANH TỪ.',o:['swelling','swell','swollen','swells'],a:0,e:'"swelling" (sự sưng tấy) là danh từ.'},
+{t:'Sau linking verb',q:'Patients often feel _______ before general anesthesia.',h:'Sau "feel" mô tả cảm xúc → TÍNH TỪ.',o:['nervous','nervously','nerve','nervousness'],a:0,e:'"nervous" (lo lắng) là tính từ.'},
+{t:'Danh từ chỉ người',q:'A blood _______ must meet strict criteria before giving blood.',h:'Sau "A blood" cần DANH TỪ chỉ người.',o:['donor','donate','donation','donating'],a:0,e:'"donor" (người hiến máu).'},
+{t:'Bệnh viêm -itis',q:'Acute _______ requires prompt evaluation to avoid rupture.',h:'Sau tính từ "Acute" cần tên bệnh viêm (-itis).',o:['appendicitis','appendiceal','appendectomy','appendices'],a:0,e:'"appendicitis" (viêm ruột thừa).'},
+{t:'Tính từ hô hấp',q:'Asthma primarily affects the _______ airway passages.',h:'Trước cụm danh từ cần TÍNH TỪ.',o:['respiratory','respire','respiration','respirator'],a:0,e:'"respiratory" (thuộc hô hấp).'},
+{t:'Trạng từ cách thức',q:'The surgeon explained the instructions _______ to the family.',h:'Bổ nghĩa cho động từ "explained" → TRẠNG TỪ.',o:['clearly','clear','clarity','clarify'],a:0,e:'"clearly" (rõ ràng) bổ nghĩa cho động từ.'},
+{t:'Hiện tại đơn',q:'Red blood cells _______ oxygen from the lungs to tissues.',h:'Chức năng sinh lý + chủ ngữ số nhiều → V0.',o:['carry','carries','carried','carrying'],a:0,e:'Chức năng sinh học chia Hiện tại đơn → "carry".'},
+{t:'Quá khứ đơn',q:'The paramedic _______ a sterile dressing at the scene.',h:'Sự việc đã xảy ra tại hiện trường → Quá khứ đơn.',o:['applied','applies','applying','apply'],a:0,e:'Tường thuật sơ cứu đã làm → "applied".'},
+{t:'Hiện tại hoàn thành',q:'The patient _______ severe headaches since Monday.',h:'"since + mốc thời gian" → Hiện tại hoàn thành.',o:['has experienced','experienced','experiences','experiencing'],a:0,e:'Có "since" → "has experienced".'},
+{t:'Mệnh đề While',q:'_______ some clotting is necessary, clotting in vessels is dangerous.',h:'Từ nối đầu câu chỉ sự tương phản (Mặc dù).',o:['While','Because','Unless','Therefore'],a:0,e:'"While" đầu câu nghĩa là "Mặc dù / Trong khi".'}
+];
+const GENS=[
+()=>{
+  const subs=['The surgical team','The attending physician','The ER nurse','The resident doctor','The specialist','The clinical intern'];
+  const verbs=['documented','evaluated','recorded','noted','monitored','reviewed'];
+  const nouns=[
+    ['transfusion','transfuse','transfusable','transfusively','sự truyền máu','a blood'],
+    ['incision','incise','incisive','incisively','vết rạch mổ','the abdominal'],
+    ['inflammation','inflame','inflammatory','inflammatorily','tình trạng viêm','local'],
+    ['dislocation','dislocate','dislocatable','dislocatively','sự trật khớp','a shoulder'],
+    ['concussion','concuss','concussive','concussively','chấn động não','a mild'],
+    ['injection','inject','injectable','injectively','mũi tiêm thuốc','an intravenous'],
+    ['medication','medicate','medicinal','medicinally','thuốc điều trị','the prescribed'],
+    ['supervision','supervise','supervisory','supervisorily','sự giám sát','close clinical'],
+    ['assessment','assess','assessable','assessably','sự đánh giá','the initial'],
+    ['cholecystectomy','cholecysto-','-ectomy','-ostomy','ca cắt túi mật','an urgent']
+  ];
+  const locs=['in the patient chart.','before the operation.','during morning rounds.','in the recovery unit.','prior to discharge.','on the medical record.'];
+  const s=subs[Math.floor(Math.random()*subs.length)],v=verbs[Math.floor(Math.random()*verbs.length)],x=nouns[Math.floor(Math.random()*nouns.length)],l=locs[Math.floor(Math.random()*locs.length)];
+  return{t:'Danh từ (N)',q:`${s} ${v} ${x[5]} _______ ${l}`,h:`Sau cụm "${x[5]}" cần một DANH TỪ.`,o:[x[0],x[1],x[2],x[3]],a:0,e:`"${x[0]}" (${x[4]}) là danh từ đứng sau cụm từ hạn định.`};
+},
+()=>{
+  const subjects=['the injured joint','the surgical site','the patient’s ankle','the affected tissue','the lower limb','the post-op wound'];
+  const linkers=['appeared','looked','became','remained','seemed','felt'];
+  const adjs=[
+    ['swollen','swelling','swell','swellingly','bị sưng phù'],
+    ['bruised','bruising','bruise','bruisingly','bị bầm tím'],
+    ['inflamed','inflammation','inflame','inflammatorily','bị viêm đỏ'],
+    ['displaced','displace','displacement','displacingly','bị di lệch'],
+    ['damaged','damage','damaging','damagingly','bị tổn thương'],
+    ['infected','infection','infect','infectiously','bị nhiễm trùng'],
+    ['complicated','complicate','complication','complicatedly','trở nên phức tạp'],
+    ['stable','stabilize','stability','stably','ổn định']
+  ];
+  const tails=['during physical exam.','after the trauma.','two hours post-op.','upon ER arrival.','despite initial icing.','during follow-up.'];
+  const sb=subjects[Math.floor(Math.random()*subjects.length)],lk=linkers[Math.floor(Math.random()*linkers.length)],x=adjs[Math.floor(Math.random()*adjs.length)],tl=tails[Math.floor(Math.random()*tails.length)];
+  return{t:'Tính từ (Adj)',q:`On inspection, ${sb} ${lk} _______ ${tl}`,h:`Sau linking verb "${lk}" cần một TÍNH TỪ mô tả trạng thái.`,o:[x[0],x[1],x[2],x[3]],a:0,e:`"${x[0]}" (${x[4]}) là tính từ đứng sau động từ nối "${lk}".`};
+},
+()=>{
+  const items=[
+    ['orally','oral','orality','oralize','qua đường uống','The antibiotic is taken'],
+    ['temporarily','temporary','temporariness','temporize','tạm thời','The splint was applied'],
+    ['carefully','careful','carefulness','care','một cách cẩn thận','The dosage was checked'],
+    ['lately','late','lateness','belate','gần đây','The chest discomfort has worsened'],
+    ['frequently','frequent','frequency','frequented','thường xuyên','Vital signs are checked'],
+    ['intravenously','intravenous','intravenosity','venous','qua đường tĩnh mạch','Fluids were administered'],
+    ['promptly','prompt','promptness','prompted','kịp thời','The bleeding was controlled'],
+    ['gradually','gradual','graduality','graduated','dần dần','The swelling subsided']
+  ];
+  const contexts=['in the emergency ward.','by the duty nurse.','according to protocol.','over the past week.','after the procedure.','to prevent complications.'];
+  const x=items[Math.floor(Math.random()*items.length)],c=contexts[Math.floor(Math.random()*contexts.length)];
+  return{t:'Trạng từ (Adv)',q:`${x[5]} _______ ${c}`,h:'Bổ nghĩa cho động từ/mệnh đề → dùng TRẠNG TỪ đuôi -ly.',o:[x[0],x[1],x[2],x[3]],a:0,e:`"${x[0]}" (${x[4]}) là trạng từ bổ nghĩa cho hành động.`};
+},
+()=>{
+  const cases=[
+    ['has persisted',['persisted','persists','persisting'],'for four consecutive days','Hiện tại hoàn thành (for + thời gian)','The abdominal pain'],
+    ['will awake',['awoke','awakes','awaking'],'in the recovery room after anesthesia','Tương lai đơn (dự báo sau mổ)','The patient'],
+    ['administered',['administers','has administered','will administer'],'epinephrine immediately upon arrival','Quá khứ đơn (sự việc đã xảy ra)','The ER team'],
+    ['carries',['carry','carried','carrying'],'oxygenated blood from the left ventricle','Hiện tại đơn (sự thật sinh lý)','The aorta'],
+    ['has improved',['improved','improved','improving'],'significantly since yesterday morning','Hiện tại hoàn thành (since + mốc thời gian)','The patient’s breathing'],
+    ['underwent',['undergoes','has undergone','will undergo'],'an emergency appendectomy last night','Quá khứ đơn (last night)','The young man']
+  ];
+  const x=cases[Math.floor(Math.random()*cases.length)];
+  return{t:'Thì động từ',q:`${x[4]} _______ ${x[2]}.`,h:`Chú ý cụm thời gian/ngữ cảnh: "${x[2]}".`,o:[x[0],...x[1]],a:0,e:`"${x[0]}" chia đúng thì ${x[3]}.`};
+},
+()=>{
+  const traps=[
+    {t:'Bẫy cấu trúc',q:'Severe compound fractures require that the limb _______ immobilized immediately.',h:'Thức giả định sau "require that" → be + V3/ed (không chia is/was).',o:['be','is','was','being'],a:0,e:'Sau "require that", động từ luôn giữ nguyên mẫu "be + V3/ed".'},
+    {t:'Bẫy cấu trúc',q:'It is essential for junior doctors _______ sterile gloves before suturing.',h:'Mẫu câu "It is + adj + for sb + to V0".',o:['to wear','wearing','wear','wore'],a:0,e:'Sau cấu trúc "It is + tính từ + for sb" luôn là "to + V0".'},
+    {t:'Bẫy cấu trúc',q:'_______ mild bruising is common, severe swelling requires an X-ray.',h:'Từ nối đầu câu mang nghĩa tương phản "Mặc dù".',o:['While','Unless','Therefore','Because'],a:0,e:'"While" đứng đầu câu tạo mệnh đề tương phản ("Mặc dù...").'},
+    {t:'Bẫy cấu trúc',q:'If a patient _______ allergic to penicillin, prescribe an alternative antibiotic.',h:'Mệnh đề "If" trong câu điều kiện loại 1 chia Hiện tại đơn.',o:['is','will be','was','being'],a:0,e:'Vế "If" không dùng "will", chia Hiện tại đơn → "is".'}
+  ];
+  return traps[Math.floor(Math.random()*traps.length)];
+}
+];
+const VOCAB=[
+{y:'N',s:'-tion / -sion',w:'operation (ca mổ), incision (vết rạch), transfusion (truyền máu), inflammation (viêm), dislocation (trật khớp), concussion (chấn động não), injection (tiêm)',r:'Sau a/the/your, tính từ hoặc làm chủ ngữ.'},
+{y:'N',s:'-ist / -er / -or',w:'anesthesiologist (BS gây mê), practitioner (người hành nghề), donor (người hiến), inhaler (ống hít)',r:'Chỉ người chuyên môn hoặc dụng cụ y tế.'},
+{y:'N',s:'-itis / -ia / -ure',w:'appendicitis (viêm ruột thừa), hepatitis (viêm gan), anesthesia (gây mê), fracture (gãy xương), suture (chỉ khâu), procedure (thủ thuật)',r:'Đuôi -itis là bệnh viêm; -ure là danh từ vật/thủ thuật.'},
+{y:'J',s:'-al / -ical / -ory',w:'surgical, medical, abdominal (bụng), bronchial (phế quản), circulatory (tuần hoàn), respiratory (hô hấp), pulmonary (phổi)',r:'Trước danh từ hoặc sau động từ to-be.'},
+{y:'V',s:'-ate / -ize / -fy / -er',w:'donate (hiến), analyze (phân tích), identify (nhận diện), modify (điều chỉnh), administer (cấp phát/tiêm), monitor (theo dõi), suffer (chịu đựng)',r:'Cẩn thận administer, monitor, suffer đuôi -er nhưng là động từ!'},
+{y:'SURG',s:'🔪 Cấu tạo từ phẫu thuật (Word Analysis)',w:'cholecystectomy (cắt bỏ túi mật), cholecysto- (gallbladder · túi mật), -ectomy (excision / removal · cắt bỏ)',r:'Ghép Gốc cơ quan (Root) + Hậu tố thủ thuật (Suffix) để suy luận nghĩa.'},
+{y:'SURG',s:'🔪 8 Hậu tố thủ thuật (Suffixes)',w:'-ectomy (removal · cắt bỏ), -otomy (surgical incision · rạch/mở), -ostomy (artificial opening · tạo lỗ mở thông), -r(h)aphy (suture, stitching · khâu nối), -oscopy (keyhole surgery · nội soi), -lithotomy (removal of calculi · mổ lấy sỏi), -pexy (fixation · cố định), -plasty (shaping · tạo hình)',r:'Phân biệt: -ectomy (cắt bỏ), -otomy (rạch vào), -ostomy (tạo lỗ thông).'},
+{y:'SURG',s:'🏥 Thuật ngữ phẫu thuật (Terms)',w:'appendectomy (removal of the appendix · cắt ruột thừa), laparoscopy (keyhole surgery in abdomen/pelvis with camera · nội soi ổ bụng), colostomy (creating an opening for colon through abdomen · mở hậu môn nhân tạo)',r:'Các thuật ngữ kết thúc bằng hậu tố thủ thuật đều là DANH TỪ (N).'},
+{y:'TRAP',s:'⚠️ Bẫy -ed & -ing',w:'appears bruised (Adj) vs suffered trauma (V2) · the healing process (N)',r:'Sau linking verb là Adj; sau a/the là N.'},
+{y:'TRAP',s:'⚠️ Bẫy Cấu trúc',w:'require that + S + be V3 · It is + adj + (for sb) + to V0 · While + mệnh đề (Mặc dù)',r:'Không chia is/was sau require that; không dùng V-ing sau It is + adj.'}
+];
+
+let xp=0,streak=0,xIdx=0,xClue=null,xDone={},pool=[],qIdx=0,qAns=false,vFilt='ALL',times=[],t0=Date.now(),autoNext=true,autoRenew=true,autoTimer=null,masteredQs={},weakTags={},quizHistory={},seenQuestions={};
+const shuf=a=>{const c=[...a];for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[c[i],c[j]]=[c[j],c[i]]}return c};
+const qKey=txt=>(txt||'').trim().toLowerCase().replace(/\s+/g,' ');
+const markSeen=txt=>{if(txt)seenQuestions[qKey(txt)]=true;};
+const isSeen=txt=>!!seenQuestions[qKey(txt)];
+const packQ=(r,idx)=>({id:r.id||(idx!==undefined?'base_'+idx:'gen_'+Math.random().toString(36).slice(2,8)),t:r.t,q:r.q,h:r.h,o:shuf(r.o.map((t,i)=>({t,c:i===r.a}))),e:r.e});
+const finalizePack=p=>({id:p.id,t:p.t,q:p.q,h:p.h,o:p.o.map(x=>x.t),a:p.o.findIndex(x=>x.c),e:p.e});
+const makeQ=(r,idx)=>finalizePack(packQ(r,idx));
+const avgS=()=>times.length?Number((times.reduce((a,b)=>a+b,0)/times.length).toFixed(1)):null;
+
+function clearAutoTimer(){if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}}
+function renderAutoNextBtn(){
+  const btn=document.getElementById('auto-next-btn');if(!btn)return;
+  btn.textContent=autoNext?'⚡ Tự động chuyển: Bật':'⏸️ Tự động chuyển: Tắt';
+  btn.className=autoNext
+    ?'text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+    :'text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700';
+}
+function toggleAutoNext(){autoNext=!autoNext;if(!autoNext)clearAutoTimer();renderAutoNextBtn();save();}
+
+function renderAutoRenewBtn(){
+  const btn=document.getElementById('auto-renew-btn');if(!btn)return;
+  btn.textContent=autoRenew?'🔄 Tự tạo đề mới: Bật':'⏹️ Tự tạo đề mới: Tắt';
+  btn.className=autoRenew
+    ?'text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+    :'text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700';
+}
+function toggleAutoRenew(){autoRenew=!autoRenew;renderAutoRenewBtn();if(qAns&&qIdx===pool.length-1)renderQuiz();save();}
+
+function getTier(){
+  const s=avgS();let cur=TIERS[0];
+  for(let i=1;i<TIERS.length;i++){const t=TIERS[i];if(xp>=t.minXp&&(s===null?xp>=t.minXp*1.4:s<=t.maxS))cur=t;else break;}
+  return cur;
+}
+function renderHud(){
+  document.getElementById('xp-count').textContent=xp;
+  document.getElementById('streak-count').textContent='🔥 '+streak;
+  const s=avgS();document.getElementById('speed-count').textContent=s!==null?s+'s/câu':'--s/câu';
+  const tier=getTier();document.getElementById('rank-badge').textContent=tier.name;
+  const ti=TIERS.findIndex(x=>x.name===tier.name);
+  document.getElementById('rank-ladder').innerHTML=TIERS.map((t,i)=>`<div class="px-2 py-1.5 rounded-lg border ${t.name===tier.name?'bg-blue-50 dark:bg-blue-950/70 border-blue-400 text-blue-800 dark:text-blue-200 font-bold':i<=ti?'bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 text-emerald-700 dark:text-emerald-300':'bg-slate-50 dark:bg-slate-800/50 border-slate-200/70 dark:border-slate-800 text-slate-400'}"><div class="truncate">${t.name===tier.name?'👑 ':''}${t.name}</div><div class="text-[10px] opacity-80">${t.minXp} XP · ${t.maxS===Infinity?'Mọi tốc độ':'≤'+t.maxS+'s'}</div></div>`).join('');
+}
+function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({xp,streak,xIdx,xDone,pool,qIdx,vFilt,autoNext,autoRenew,masteredQs,weakTags,quizHistory,seenQuestions,times:times.slice(-40)}))}catch(e){}}
+window.exportProgressSnapshot = function(){
+  return { xp, streak, xIdx, xDone, pool, qIdx, vFilt, autoNext, autoRenew, masteredQs, weakTags, quizHistory, seenQuestions, times: times.slice(-40) };
+};
+window.importProgressSnapshot = function(d){
+  if(!d||typeof d!=='object')return;
+  clearAutoTimer();
+  xp=typeof d.xp==='number'?d.xp:0;
+  streak=typeof d.streak==='number'?d.streak:0;
+  xIdx=typeof d.xIdx==='number'?d.xIdx:0;
+  xDone=(d.xDone&&typeof d.xDone==='object')?d.xDone:{};
+  masteredQs=(d.masteredQs&&typeof d.masteredQs==='object')?d.masteredQs:{};
+  weakTags=(d.weakTags&&typeof d.weakTags==='object')?d.weakTags:{};
+  quizHistory=(d.quizHistory&&typeof d.quizHistory==='object')?d.quizHistory:{};
+  seenQuestions=(d.seenQuestions&&typeof d.seenQuestions==='object')?d.seenQuestions:{};
+  pool=Array.isArray(d.pool)&&d.pool.length?d.pool:QUIZ.map((r,i)=>makeQ(r,i));
+  qIdx=typeof d.qIdx==='number'?Math.min(d.qIdx,Math.max(0,pool.length-1)):0;
+  vFilt=typeof d.vFilt==='string'?d.vFilt:'ALL';
+  autoNext=typeof d.autoNext==='boolean'?d.autoNext:true;
+  autoRenew=typeof d.autoRenew==='boolean'?d.autoRenew:true;
+  times=Array.isArray(d.times)?d.times:[];
+  xClue=null;
+  qAns=false;
+  save();
+  renderHud();
+  renderXray();
+  renderQuiz();
+  filterVocab(vFilt);
+};
+function load(){
+  try{
+    const d=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
+    if(d){xp=d.xp||0;streak=d.streak||0;xIdx=d.xIdx||0;xDone=d.xDone||{};masteredQs=d.masteredQs||{};weakTags=d.weakTags||{};quizHistory=d.quizHistory||{};seenQuestions=d.seenQuestions||{};pool=Array.isArray(d.pool)&&d.pool.length?d.pool:QUIZ.map((r,i)=>makeQ(r,i));qIdx=typeof d.qIdx==='number'?Math.min(d.qIdx,Math.max(0,pool.length-1)):0;vFilt=d.vFilt||'ALL';autoNext=typeof d.autoNext==='boolean'?d.autoNext:true;autoRenew=typeof d.autoRenew==='boolean'?d.autoRenew:true;times=Array.isArray(d.times)?d.times:[];}
+    else pool=QUIZ.map((r,i)=>makeQ(r,i));
+  }catch(e){pool=QUIZ.map((r,i)=>makeQ(r,i));}
+}
+function isQuizUnlocked(idx){
+  return idx===qIdx||!!quizHistory[idx]?.done||(quizHistory[idx]?.wrongIndices||[]).length>0;
+}
+function resetSavedProgress(){clearAutoTimer();xp=0;streak=0;xIdx=0;xDone={};masteredQs={};weakTags={};quizHistory={};seenQuestions={};pool=QUIZ.map((r,i)=>makeQ(r,i));qIdx=0;times=[];save();renderHud();renderXray();renderQuiz();filterVocab(vFilt);}
+function score(pts){const sec=Math.max(.5,(Date.now()-t0)/1000);times.push(Number(sec.toFixed(1)));if(times.length>40)times.shift();xp+=pts+(sec<=2.5?12:sec<=4.5?5:0);streak++;renderHud();save();}
+function miss(){streak=0;xp=Math.max(0,xp-15);renderHud();save();}
+
+function switchTab(tab){
+  ['xray','quiz','vocab'].forEach(t=>{
+    document.getElementById('view-'+t).classList.toggle('hidden',t!==tab);
+    document.getElementById('tab-'+t).className=t===tab?'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 text-white':'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+  });
+}
+function renderXray(){
+  t0=Date.now();const it=XRAY[xIdx];document.getElementById('xray-counter').textContent=`Ca ${xIdx+1} / ${XRAY.length} · ${it.u}`;
+  const box=document.getElementById('xray-sentence-box');box.innerHTML='';
+  it.p.forEach((p,i)=>{
+    if(p.b){const sp=document.createElement('span');sp.className=xDone[xIdx]?'inline-block px-3 py-0.5 mx-1 rounded-lg bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-bold':'xray-blank inline-block px-3 py-0.5 mx-1 rounded-lg bg-blue-500/20 border border-blue-400 text-blue-300 font-bold';sp.textContent=xDone[xIdx]||'[ ____ ]';box.appendChild(sp);}
+    else if(p.s){const b=document.createElement('button');b.type='button';b.className=`inline-block px-2 py-0.5 mx-0.5 rounded-lg font-semibold ${xClue===i?'bg-amber-400 text-slate-950':'bg-amber-400/20 text-amber-300 border border-amber-400/50'}`;b.textContent=p.t;b.onclick=()=>{xClue=i;renderXray()};box.appendChild(b);}
+    else box.appendChild(document.createTextNode(p.t));
+  });
+  const bp=it.p.find(p=>p.b),ap=xClue!==null?it.p[xClue]:it.p.find(p=>p.s);
+  document.getElementById('xray-analysis').innerHTML=`<div class="text-xs font-bold text-blue-700 dark:text-blue-300">🔍 Tín hiệu: "${ap.t}"</div><div class="text-sm mt-1 mb-3">${ap.c}</div><div class="flex flex-wrap gap-2">${bp.o.map(o=>`<button type="button" onclick="chkX('${o.replace(/'/g,"\\'")}')" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border ${xDone[xIdx]===o?'bg-emerald-600 text-white border-emerald-600':'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700'}">${o}</button>`).join('')}</div>${xDone[xIdx]?`<div class="mt-3 text-xs sm:text-sm text-emerald-700 dark:text-emerald-300 font-medium">✅ ${it.m}</div>`:''}`;
+}
+function chkX(o){if(o===XRAY[xIdx].p.find(p=>p.b).a){if(!xDone[xIdx]){xDone[xIdx]=o;score(15)}renderXray()}else{miss();const a=document.getElementById('xray-analysis');a.classList.remove('shake');void a.offsetWidth;a.classList.add('shake')}}
+function nextXray(d){xIdx=(xIdx+d+XRAY.length)%XRAY.length;xClue=null;save();renderXray()}
+
+function getSortedWeakTags(){
+  return Object.entries(weakTags).filter(([,cnt])=>cnt>0).sort((a,b)=>b[1]-a[1]);
+}
+function renderWeakPanel(){
+  const box=document.getElementById('weak-structure-box');if(!box)return;
+  const top=getSortedWeakTags().slice(0,3);
+  if(!top.length){
+    box.classList.add('hidden');
+    return;
+  }
+  box.classList.remove('hidden');
+  box.innerHTML=`<div class="flex flex-wrap items-center gap-1.5"><span class="font-bold text-rose-700 dark:text-rose-300">⚠️ Hay sai:</span>${top.map(([tag,cnt])=>`<span class="px-2 py-0.5 rounded-md bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-200 font-semibold">${tag} (${cnt})</span>`).join('')}</div><button type="button" onclick="generateTargetedQuiz()" class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold">🎯 Luyện phần hay sai</button>`;
+}
+function pickGenByTag(tag){
+  const t=(tag||'').toLowerCase();
+  if(t.includes('danh từ')||t.includes('mạo từ')||t.includes('người')||t.includes('-itis'))return GENS[0]();
+  if(t.includes('tính từ')||t.includes('-ed')||t.includes('-ing')||t.includes('linking'))return GENS[1]();
+  if(t.includes('trạng từ'))return GENS[2]();
+  if(t.includes('thì')||t.includes('hoàn thành')||t.includes('quá khứ')||t.includes('tương lai'))return GENS[3]();
+  if(t.includes('require')||t.includes('it is')||t.includes('điều kiện')||t.includes('while')||t.includes('cấu trúc'))return GENS[4]();
+  return GENS[Math.floor(Math.random()*GENS.length)]();
+}
+function produceUniqueGenerated(count,targetTags=[]){
+  const out=[],localUsed=new Set();
+  let guard=0;
+  while(out.length<count&&guard<400){
+    guard++;
+    const chosenTag=targetTags.length?targetTags[out.length%targetTags.length]:'';
+    const raw=pickGenByTag(chosenTag);
+    if(chosenTag)raw.t=chosenTag;
+    const key=qKey(raw.q);
+    if(isSeen(raw.q)||localUsed.has(key))continue;
+    localUsed.add(key);
+    out.push(makeQ(raw));
+  }
+  return out;
+}
+function generateTargetedQuiz(){
+  clearAutoTimer();
+  pool.forEach((item,idx)=>{if(quizHistory[idx]?.done){if(item.id)masteredQs[item.id]=true;markSeen(item.q);}});
+  const weakList=getSortedWeakTags();
+  const targetTags=weakList.map(([tag])=>tag);
+  const unseenBase=QUIZ.map((r,i)=>({r,id:'base_'+i}))
+    .filter(x=>!masteredQs[x.id]&&!isSeen(x.r.q)&&(!targetTags.length||targetTags.includes(x.r.t)))
+    .map(x=>makeQ({...x.r,id:x.id}));
+  const needGen=Math.max(8,22-unseenBase.length);
+  const autoGen=produceUniqueGenerated(needGen,targetTags);
+  pool=shuf([...unseenBase,...autoGen]);
+  qIdx=0;quizHistory={};save();renderQuiz();
+}
+function generateOpenQuizBatch(pruneCompleted=true){
+  clearAutoTimer();
+  if(pruneCompleted){
+    pool.forEach((item,idx)=>{if(quizHistory[idx]?.done){if(item.id)masteredQs[item.id]=true;markSeen(item.q);}});
+  }
+  const unseenBase=QUIZ.map((r,i)=>({r,id:'base_'+i}))
+    .filter(x=>!masteredQs[x.id]&&!isSeen(x.r.q))
+    .map(x=>makeQ({...x.r,id:x.id}));
+  const weakList=getSortedWeakTags();
+  const targetTags=weakList.map(([tag])=>tag);
+  const needGen=Math.max(8,22-unseenBase.length);
+  const autoGen=produceUniqueGenerated(needGen,targetTags);
+  pool=shuf([...unseenBase,...autoGen]);
+  qIdx=0;quizHistory={};save();renderQuiz();
+}
+function jumpToQuiz(idx){
+  if(idx<0||idx>=pool.length||!isQuizUnlocked(idx))return;
+  clearAutoTimer();
+  closeQuizPicker();
+  qIdx=idx;
+  save();
+  renderQuiz();
+}
+function toggleQuizPicker(){
+  const menu=document.getElementById('quiz-picker-menu');
+  if(menu)menu.classList.toggle('hidden');
+}
+function closeQuizPicker(){
+  const menu=document.getElementById('quiz-picker-menu');
+  if(menu)menu.classList.add('hidden');
+}
+function renderQuiz(){
+  clearAutoTimer();renderAutoNextBtn();renderAutoRenewBtn();renderWeakPanel();
+  if(!pool.length)generateOpenQuizBatch(false);
+  if(qIdx>=pool.length)qIdx=0;
+  const q=pool[qIdx];
+  markSeen(q.q);
+  const hist=quizHistory[qIdx]||{done:false,wrongIndices:[]};
+  qAns=!!hist.done;
+  t0=Date.now();
+  document.getElementById('quiz-tag').textContent=q.t;
+  document.getElementById('quiz-progress').textContent=`Câu ${qIdx+1} / ${pool.length}`;
+  document.getElementById('quiz-question').innerHTML=q.q.replace('_______','<span class="px-3 py-0.5 mx-1 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold">_______</span>');
+  const hb=document.getElementById('quiz-hint-box');hb.classList.add('hidden');hb.textContent='💡 Gợi ý: '+q.h;
+  const fb=document.getElementById('quiz-feedback');
+  const nextBtn=document.getElementById('quiz-next-btn');
+  const prevBtn=document.getElementById('quiz-prev-btn');
+  if(prevBtn)prevBtn.disabled=(qIdx===0);
+  const pickerLabel=document.getElementById('quiz-picker-label');
+  if(pickerLabel)pickerLabel.textContent=`${qIdx+1}/${pool.length}`;
+  const pillsEl=document.getElementById('quiz-nav-pills');
+  if(pillsEl){
+    pillsEl.innerHTML=pool.map((_,idx)=>{
+      const isCur=idx===qIdx;
+      const isDone=!!quizHistory[idx]?.done;
+      const hasErr=(quizHistory[idx]?.wrongIndices||[]).length>0&&!isDone;
+      const unlocked=isCur||isDone||hasErr;
+      const cls=isCur
+        ?'h-8 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-xs'
+        :isDone
+          ?'h-8 rounded-lg text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+          :hasErr
+            ?'h-8 rounded-lg text-xs font-semibold bg-rose-100 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
+            :'h-8 rounded-lg text-xs font-medium bg-slate-100/60 dark:bg-slate-800/40 text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-55';
+      return`<button type="button" ${unlocked?`onclick="jumpToQuiz(${idx})"`:'disabled'} class="${cls}">${idx+1}</button>`;
+    }).join('');
+  }
+  const el=document.getElementById('quiz-options');el.innerHTML='';
+  q.o.forEach((opt,i)=>{
+    const b=document.createElement('button');b.type='button';
+    const isWrong=(hist.wrongIndices||[]).includes(i);
+    if(hist.done&&i===q.a){
+      b.className='p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 text-left text-sm font-semibold flex items-center gap-2.5';
+      b.disabled=true;
+    }else if(isWrong){
+      b.className='p-3.5 rounded-xl border border-rose-300 bg-rose-50 dark:bg-rose-950/40 text-rose-700 text-left text-sm opacity-75 flex items-center gap-2.5';
+      b.disabled=true;
+    }else{
+      b.className='p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-left text-sm font-medium flex items-center gap-2.5';
+      b.disabled=hist.done;
+    }
+    b.innerHTML=`<span class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-700 text-xs font-bold flex items-center justify-center shrink-0">${['A','B','C','D'][i]}</span><span>${opt}</span>`;
+    b.onclick=()=>ansQ(i,b);
+    el.appendChild(b);
+  });
+  if(hist.done){
+    fb.className='p-4 rounded-xl text-sm mb-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 text-emerald-800 dark:text-emerald-200';
+    fb.textContent='✅ '+q.e;
+    fb.classList.remove('hidden');
+    if(qIdx===pool.length-1&&!autoRenew){
+      nextBtn.textContent='🎉 Đã hoàn thành bộ đề · Bấm tạo đề mới';
+    }else{
+      nextBtn.textContent=(qIdx===pool.length-1)?'🎉 Hoàn thành & Tạo đề mới →':'Ca tiếp theo →';
+    }
+    nextBtn.classList.remove('hidden');
+  }else if((hist.wrongIndices||[]).length){
+    fb.className='p-3 rounded-xl text-xs sm:text-sm mb-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 text-rose-700';
+    fb.textContent='❌ Chưa chính xác! Xem gợi ý và chọn lại nhé.';
+    fb.classList.remove('hidden');
+    nextBtn.classList.add('hidden');
+  }else{
+    fb.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+  }
+}
+function ansQ(i,b){
+  if(qAns)return;const q=pool[qIdx],fb=document.getElementById('quiz-feedback'),nextBtn=document.getElementById('quiz-next-btn');
+  if(!quizHistory[qIdx])quizHistory[qIdx]={done:false,wrongIndices:[]};
+  if(i===q.a){
+    qAns=true;
+    quizHistory[qIdx].done=true;
+    if(q.id)masteredQs[q.id]=true;
+    markSeen(q.q);
+    const cleanTag=q.t;
+    if(weakTags[cleanTag]>0)weakTags[cleanTag]=Math.max(0,weakTags[cleanTag]-1);
+    b.className='p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 text-left text-sm font-semibold flex items-center gap-2.5';
+    const isLast=(qIdx===pool.length-1);
+    fb.className='p-4 rounded-xl text-sm mb-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 text-emerald-800 dark:text-emerald-200';
+    fb.textContent='✅ '+q.e;
+    fb.classList.remove('hidden');
+    nextBtn.textContent=isLast?'🎉 Hoàn thành & Tạo đề mới →':'Ca tiếp theo →';
+    nextBtn.classList.remove('hidden');
+    score(20);
+    renderWeakPanel();
+    document.querySelectorAll('#quiz-options button').forEach(x=>x.disabled=true);
+    if(isLast){
+      if(autoRenew){autoTimer=setTimeout(()=>generateOpenQuizBatch(true),950);}
+    }else if(autoNext){
+      autoTimer=setTimeout(()=>nextQuiz(),850);
+    }
+  } else {
+    if(!quizHistory[qIdx].wrongIndices.includes(i))quizHistory[qIdx].wrongIndices.push(i);
+    const cleanTag=q.t;
+    weakTags[cleanTag]=(weakTags[cleanTag]||0)+1;
+    miss();renderWeakPanel();
+    b.disabled=true;b.className='p-3.5 rounded-xl border border-rose-300 bg-rose-50 dark:bg-rose-950/40 text-rose-700 text-left text-sm opacity-75 shake flex items-center gap-2.5';
+    fb.className='p-3 rounded-xl text-xs sm:text-sm mb-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 text-rose-700';
+    fb.textContent='❌ Chưa chính xác! Xem gợi ý và chọn lại nhé.';
+    fb.classList.remove('hidden');
+  }
+}
+function prevQuiz(){if(qIdx<=0)return;clearAutoTimer();qIdx--;save();renderQuiz()}
+function nextQuiz(){
+  clearAutoTimer();
+  if(qIdx>=pool.length-1){
+    generateOpenQuizBatch(true);
+    return;
+  }
+  qIdx++;save();renderQuiz();
+}
+
+function speak(t,el){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const cleanEn=t
+    .replace(/\([^)]*\)/g,'')
+    .replace(/^[-–—]+|[-–—]+$/g,'')
+    .replace(/[\u00C0-\u1EF9]+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+  if(!cleanEn)return;
+  const u=new SpeechSynthesisUtterance(cleanEn);
+  u.lang='en-US';
+  u.rate=.92;
+  if(el){el.classList.add('ring-2','ring-blue-500');u.onend=u.onerror=()=>el.classList.remove('ring-2','ring-blue-500');}
+  window.speechSynthesis.speak(u);
+}
+function filterVocab(type){
+  vFilt=type;save();
+  document.querySelectorAll('.v-filter').forEach(b=>{
+    const m=b.dataset.type===type;
+    b.className=b.dataset.type==='TRAP'?(m?'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-600 text-white':'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 dark:bg-rose-950/50 text-rose-600 border border-rose-200 dark:border-rose-800'):b.dataset.type==='SURG'?(m?'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-600 text-white':'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-50 dark:bg-teal-950/50 text-teal-700 border border-teal-200 dark:border-teal-800'):(m?'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 dark:bg-slate-700 text-white':'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800');
+  });
+  const bc={N:'bg-blue-100 text-blue-700',J:'bg-emerald-100 text-emerald-700',A:'bg-amber-100 text-amber-700',V:'bg-purple-100 text-purple-700',SURG:'bg-teal-100 text-teal-700',TRAP:'bg-rose-100 text-rose-700'};
+  const list=type==='ALL'?VOCAB:VOCAB.filter(x=>x.y===type);
+  document.getElementById('vocab-grid').innerHTML=list.map(it=>{
+    const isStatic=(it.y==='SURG'||it.y==='TRAP');
+    const itemsHtml=it.w.split(/\s*,\s*/).filter(Boolean).map(p=>{
+      const m=p.match(/^([^(]+)(\([^)]+\))?$/);
+      const label=`${m?m[1].trim():p}${m&&m[2]?` <span class="text-slate-500 font-normal">${m[2]}</span>`:''}`;
+      if(isStatic){
+        return`<span class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left">${label}</span>`;
+      }
+      return`<button type="button" onclick="speak('${p.replace(/\\/g,"\\\\").replace(/'/g,"\\'")}')" class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left">🔊 ${label}</button>`;
+    }).join('');
+    return`<div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between"><div><div class="flex justify-between gap-2 mb-3"><span class="text-xs font-bold px-2.5 py-1 rounded-lg ${bc[it.y]}">${it.s}</span>${isStatic?'':'<span class="text-[11px] text-slate-400">👆 Chạm để nghe</span>'}</div><div class="flex flex-wrap gap-1.5 mb-3">${itemsHtml}</div></div><div class="text-xs text-slate-500 pt-2.5 border-t border-slate-100 dark:border-slate-800">📌 ${it.r}</div></div>`;
+  }).join('');
+}
+document.addEventListener('click',e=>{
+  const menu=document.getElementById('quiz-picker-menu');
+  const btn=document.getElementById('quiz-picker-btn');
+  if(menu&&!menu.classList.contains('hidden')&&!menu.contains(e.target)&&(!btn||!btn.contains(e.target))){
+    closeQuizPicker();
+  }
+});
+window.addEventListener('DOMContentLoaded',()=>{load();renderHud();renderXray();renderQuiz();filterVocab(vFilt);});
+</script>
+</body>
+</html>
