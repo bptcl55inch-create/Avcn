@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Medical English ER - Ứng dụng luyện phản xạ từ loại, đuôi từ, thì động từ và thực chiến giao tiếp Speaking tiếng Anh chuyên ngành Y khoa.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232563eb'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='36'%3E%F0%9F%A9%BA%3C/text%3E%3C/svg%3E">
+<title>Medical English ER</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Inter',sans-serif}@keyframes pulse-border{0%,100%{box-shadow:0 0 0 0 rgba(59,130,246,.4)}50%{box-shadow:0 0 0 6px rgba(59,130,246,0)}}.xray-blank{animation:pulse-border 2s infinite}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}.shake{animation:shake .3s ease-in-out 2}@keyframes popIn{0%{transform:scale(.95);opacity:0}100%{transform:scale(1);opacity:1}}.pop-in{animation:popIn .25s ease-out forwards}
+@keyframes ecgDraw{0%{stroke-dashoffset:900}100%{stroke-dashoffset:0}}.ecg-line{stroke-dasharray:900;stroke-dashoffset:900;animation:ecgDraw 2.3s cubic-bezier(.25,.8,.25,1) forwards}
+@keyframes panelSlideDown{0%{opacity:0;transform:translateY(-18px) scale(.97)}100%{opacity:1;transform:translateY(0) scale(1)}}.panel-pull{opacity:0;animation:panelSlideDown .55s ease-out 1.75s forwards}
+</style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen">
+<div class="max-w-4xl mx-auto p-4 sm:p-6">
+<div id="sync-warning-banner" role="region" aria-label="Cảnh báo đồng bộ" class="mb-4 p-3.5 sm:p-4 rounded-2xl bg-amber-100 dark:bg-amber-950/80 border-2 border-amber-400 dark:border-amber-600 text-amber-950 dark:text-amber-100 shadow-sm flex items-center justify-between gap-3">
+<div class="flex items-center gap-2.5 text-xs sm:text-sm font-bold leading-snug">
+<span class="text-xl shrink-0" aria-hidden="true">⚠️</span>
+<span>Lưu ý phải đồng bộ trước khi tắt web, nếu ko bạn là 1 thằng đần tên Quân</span>
+</div>
+<button type="button" onclick="openCloudModal()" aria-label="Mở hộp thoại đồng bộ đám mây" class="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-sm">☁️ Đồng bộ ngay</button>
+</div>
+<header class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm mb-5">
+<div class="flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center text-2xl">🩺</div>
+<div><h1 class="text-lg sm:text-xl font-bold">Medical English ER</h1><p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Phản xạ Từ loại · Đuôi từ & Thì Y khoa</p></div>
+</div>
+<div class="flex flex-wrap items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-xl text-xs">
+<span>Chuỗi:</span><b id="streak-count" class="text-base text-amber-500">🔥 0</b><span>|</span>
+<span>XP:</span><b id="xp-count" class="text-base text-emerald-600 dark:text-emerald-400">0</b><span>|</span>
+<span>Tốc độ:</span><b id="speed-count" class="text-blue-600 dark:text-blue-400">--s/câu</b>
+</div>
+</div>
+<div class="mt-3.5 pt-3.5 border-t border-slate-100 dark:border-slate-800">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+<div class="flex items-center gap-2"><span class="text-xs font-semibold text-slate-500">Cảnh giới:</span><span id="rank-badge" class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-blue-600 text-white">Con Người</span></div>
+<div class="flex flex-wrap items-center gap-2"><span id="save-status" class="text-xs text-emerald-600 font-medium">💾 Đã tự lưu</span><button type="button" onclick="openGuideModal()" aria-label="Mở hướng dẫn sử dụng" class="text-xs px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold">❓ Hướng dẫn</button><button type="button" id="header-sync-btn" onclick="openCloudModal()" aria-label="Đồng bộ tiến trình với thiết bị khác" class="text-xs px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-medium">☁️ Đồng bộ máy khác</button><button type="button" onclick="confirmResetProgress(this)" aria-label="Xóa tiến trình đã lưu trên máy" class="text-xs px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-600">Xóa lưu</button></div>
+</div>
+</div>
+<div id="rank-ladder" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1.5 text-xs"></div>
+</div>
+<nav aria-label="Điều hướng chính" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+<button type="button" onclick="switchTab('xray')" id="tab-xray" aria-pressed="true" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 text-white">🔬 Soi X-Quang</button>
+<button type="button" onclick="switchTab('quiz')" id="tab-quiz" aria-pressed="false" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">⚡ Cấp Cứu (Quiz)</button>
+<button type="button" onclick="switchTab('vocab')" id="tab-vocab" aria-pressed="false" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">🗂️ Kho Từ & Bẫy</button>
+<button type="button" onclick="switchTab('speaking')" id="tab-speaking" aria-pressed="false" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">🎙️ Kho Speaking</button>
+</nav>
+</header>
+
+<section id="view-xray" class="pop-in space-y-4">
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+<span class="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-lg">Chạm từ màu vàng để soi tín hiệu</span>
+<div class="flex items-center gap-2"><span id="xray-counter" class="text-xs text-slate-400">Ca 1 / 8</span><button type="button" onclick="nextXray(-1)" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">← Trước</button><button type="button" onclick="nextXray(1)" class="p-2 rounded-lg bg-slate-900 dark:bg-slate-700 text-white text-xs">Tiếp →</button></div>
+</div>
+<div id="xray-sentence-box" class="p-5 rounded-2xl bg-slate-900 text-slate-100 text-base sm:text-xl leading-relaxed font-medium border border-slate-700"></div>
+<div id="xray-analysis" class="mt-4 p-4 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60"></div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+<div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800"><b class="text-blue-600 block mb-1">1. DANH TỪ (N)</b>Sau <code>a/the/your</code>, Adj. Đuôi: <b>-tion, -ment, -ist, -ure, -itis</b></div>
+<div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800"><b class="text-emerald-600 block mb-1">2. TÍNH TỪ (Adj)</b>Trước N, sau <code>be/feel/appear</code>. Đuôi: <b>-al, -ed, -ive, -ous, -ble</b> <span class="text-slate-400">(khác V-ed chia thì)</span></div>
+<div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800"><b class="text-amber-600 block mb-1">3. TRẠNG TỪ (Adv)</b>Cạnh V thường, đầu câu + phẩy. Đuôi: <b>-ly</b> <span class="text-slate-400">(trừ friendly, elderly, likely là Adj)</span></div>
+<div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800"><b class="text-purple-600 block mb-1">4. ĐỘNG TỪ (V)</b>Sau S, <code>will/can/to</code>. Đuôi: <b>-ate, -ize, -fy, -en</b></div>
+</div>
+</section>
+
+<section id="view-quiz" class="hidden pop-in">
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+<div class="flex items-center gap-2"><span id="quiz-tag" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">Quiz</span><span id="quiz-progress" class="text-xs text-slate-400">Câu 1</span></div>
+<div class="flex flex-wrap gap-2"><button type="button" id="auto-next-btn" onclick="toggleAutoNext()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">⚡ Tự động chuyển: Bật</button><button type="button" id="auto-renew-btn" onclick="toggleAutoRenew()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">🔄 Tự tạo đề mới: Bật</button><button type="button" onclick="generateOpenQuizBatch(true)" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">🎲 Tạo đề mới</button><button type="button" onclick="document.getElementById('quiz-hint-box').classList.toggle('hidden')" class="text-xs px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">💡 Gợi ý</button></div>
+</div>
+<div id="weak-structure-box" class="mb-4 p-3 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-800/60 flex flex-wrap items-center justify-between gap-2 text-xs"></div>
+<div id="quiz-question" class="text-base sm:text-lg font-medium leading-relaxed p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 mb-3"></div>
+<div id="quiz-hint-box" class="hidden mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs sm:text-sm text-amber-800 dark:text-amber-200"></div>
+<div id="quiz-options" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4"></div>
+<div id="quiz-feedback" class="hidden p-4 rounded-xl text-sm mb-4"></div>
+<div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800"><div class="flex items-center gap-2 relative"><button type="button" id="quiz-prev-btn" onclick="prevQuiz()" aria-label="Quay lại câu trước" class="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold disabled:opacity-40 shrink-0">← Câu trước</button><div class="relative"><button type="button" id="quiz-picker-btn" onclick="toggleQuizPicker()" aria-expanded="false" aria-controls="quiz-picker-menu" aria-label="Mở danh sách chọn nhanh câu hỏi" class="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-700"><span>📋 Câu <span id="quiz-picker-label">1/--</span></span><span class="text-xs opacity-70" aria-hidden="true">▾</span></button><div id="quiz-picker-menu" role="dialog" aria-label="Danh sách câu hỏi" class="hidden absolute bottom-full left-0 mb-2 w-60 p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl z-30"><div class="flex items-center justify-between text-xs font-semibold text-slate-400 px-1 pb-2 mb-2 border-b border-slate-100 dark:border-slate-800"><span>Chọn nhanh câu hỏi</span><button type="button" onclick="closeQuizPicker()" aria-label="Đóng danh sách câu hỏi" class="px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">✕</button></div><div id="quiz-nav-pills" class="grid grid-cols-5 gap-1.5 max-h-56 overflow-y-auto"></div></div></div></div><button type="button" id="quiz-next-btn" onclick="nextQuiz()" class="hidden py-2 px-4 rounded-xl bg-blue-600 text-white text-xs sm:text-sm font-semibold shrink-0">Ca tiếp theo →</button></div>
+</div>
+</section>
+
+<section id="view-vocab" class="hidden pop-in space-y-4">
+<div class="flex flex-wrap gap-2">
+<button type="button" onclick="filterVocab('ALL')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white" data-type="ALL">Tất cả</button>
+<button type="button" onclick="filterVocab('N')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" data-type="N">Danh từ (N)</button>
+<button type="button" onclick="filterVocab('J')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" data-type="J">Tính từ (Adj)</button>
+<button type="button" onclick="filterVocab('A')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" data-type="A">Trạng từ (Adv)</button>
+<button type="button" onclick="filterVocab('V')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" data-type="V">Động từ (V)</button>
+<button type="button" onclick="filterVocab('SURG')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800" data-type="SURG">🔪 Thủ thuật phẫu thuật</button>
+<button type="button" onclick="filterVocab('TRAP')" class="v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800" data-type="TRAP">⚠️ Bẫy & Cấu trúc</button>
+</div>
+<div id="vocab-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+</section>
+
+<!-- Tab 4: Kho Speaking Y Khoa -->
+<section id="view-speaking" class="hidden pop-in space-y-4">
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div>
+<h2 class="text-base sm:text-lg font-bold flex items-center gap-2">🎙️ Phòng Luyện Nói Y Khoa (<span id="spk-total-count">0</span> Bài)</h2>
+<p class="text-xs text-slate-500 dark:text-slate-400">Ưu tiên truyền đạt đúng ý & bật từ khóa lõi · Không chấm lỗi ngữ pháp</p>
+</div>
+<div class="flex flex-wrap gap-2">
+<button type="button" onclick="randomSpeakingCard()" aria-label="Bốc thăm ngẫu nhiên một bài luyện nói" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-sm">🎲 Bốc thăm ngẫu nhiên</button>
+<button type="button" onclick="document.getElementById('spk-cheat-sheet').classList.toggle('hidden')" aria-label="Bật tắt bảng mẹo 30 giây và từ khóa" class="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-semibold">⚡ Mẹo 30s & 3 Từ khóa</button>
+<button type="button" onclick="openPhrasebookModal()" aria-label="Mở sổ tay câu tủ cá nhân" class="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold">📒 Sổ tay câu tủ (<span id="phrasebook-count">0</span>)</button>
+</div>
+</div>
+
+<!-- Bảng tra nhanh Chiến thuật 30s & từ khóa các bài -->
+<div id="spk-cheat-sheet" class="hidden p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-3 text-xs">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 space-y-1.5">
+<div class="font-bold text-blue-600 dark:text-blue-400">⏱️ Chiến thuật 30 giây vàng & 3 bước bất bại</div>
+<div><b>1. Mở đầu:</b> Chào tên + hỏi lý do (<i>"Good morning [Tên]. What brings you in today?"</i> / <i>"Hi Doctor, I have pain in my..."</i>).</div>
+<div><b>2. Thân bài:</b> Vai A hỏi/báo lần lượt 3 gạch đầu dòng; Vai B đáp trọng tâm, nếu A khựng thì hỏi ngược (<i>"What does it involve?"</i>, <i>"Can it be treated?"</i>).</div>
+<div><b>3. Kết thúc:</b> Chốt hướng xử lý (<i>"I'll take a look / we'll take X-rays"</i>) & cảm ơn.</div>
+<div class="text-amber-700 dark:text-amber-300 font-medium pt-1">💡 Quên từ chuyên ngành → thay bằng từ A1 (<i>fracture → broken bone</i>). Quên tên/số phòng → bịa tự nhiên, không đứng im!</div>
+</div>
+<div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700">
+<div class="font-bold text-emerald-600 dark:text-emerald-400 mb-1.5">🔑 Nhìn tên bài → Bật ngay 3 từ khóa (<span id="spk-cheat-count">0</span> bài)</div>
+<div id="spk-13-keywords" class="space-y-1 max-h-40 overflow-y-auto pr-1 text-xs"></div>
+</div>
+</div>
+</div>
+
+<!-- Bộ lọc bối cảnh & Chọn bài -->
+<div class="flex flex-wrap items-center gap-2 pt-1">
+<button type="button" onclick="setSpeakingFilter('ALL')" data-sfilt="ALL" class="s-filt px-3 py-1 rounded-lg text-xs font-semibold bg-slate-900 dark:bg-blue-600 text-white">Tất cả (<span id="spk-cnt-all">0</span>)</button>
+<button type="button" onclick="setSpeakingFilter('CLINIC')" data-sfilt="CLINIC" class="s-filt px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">🩺 Lâm sàng · Y tế — Bệnh nhân (<span id="spk-cnt-clinic">0</span>)</button>
+<button type="button" onclick="setSpeakingFilter('STAFF')" data-sfilt="STAFF" class="s-filt px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">🏥 Nội bộ BV · Đồng nghiệp (<span id="spk-cnt-staff">0</span>)</button>
+</div>
+<div id="spk-unit-list" class="flex flex-wrap gap-1.5"></div>
+</div>
+
+<!-- Thanh định vị bối cảnh & Tâm thế vai A / vai B -->
+<div id="spk-context-bar" class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl p-4 border border-blue-200/80 dark:border-slate-700 space-y-2.5"></div>
+
+<!-- Khu vực Kịch bản đối thoại + 3 Mức độ che chữ + Sân tập ứng biến -->
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+<div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="text-xs font-semibold text-slate-500 mr-1">Đóng vai:</span>
+<button type="button" id="role-btn-A" onclick="setSpeakingRole('A')" class="px-3 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white">Vai A</button>
+<button type="button" id="role-btn-B" onclick="setSpeakingRole('B')" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Vai B</button>
+</div>
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="text-xs font-semibold text-slate-500 mr-1">Chế độ:</span>
+<button type="button" onclick="setSpeakingMask(0)" data-smask="0" class="s-mask px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white">👁️ Hiện full</button>
+<button type="button" onclick="setSpeakingMask(1)" data-smask="1" class="s-mask px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">🔑 Chỉ từ khóa</button>
+<button type="button" onclick="setSpeakingMask(2)" data-smask="2" class="s-mask px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">🥷 Che hết (Thực chiến)</button>
+</div>
+</div>
+
+<!-- Phao cứu sinh ứng biến (Panic Buttons) -->
+<div class="flex flex-wrap items-center gap-2">
+<span class="text-xs font-bold text-rose-600 dark:text-rose-400">🛟 Phao cứu sinh:</span>
+<button type="button" onclick="togglePanicPanel('radar')" class="px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-xs font-semibold">🧭 Flow Radar 3 bước</button>
+<button type="button" onclick="togglePanicPanel('a1')" class="px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-200 border border-teal-200 dark:border-teal-800 text-xs font-semibold">🔄 Từ thay thế A1</button>
+<button type="button" onclick="togglePanicPanel('filler')" class="px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-800 text-xs font-semibold">💬 Cụm câu giờ tự nhiên</button>
+</div>
+<div id="spk-panic-box" class="hidden p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs space-y-1.5"></div>
+
+<div class="text-xs text-slate-400 flex flex-wrap items-center justify-between gap-2">
+<span>💡 Bôi đen bất kỳ từ/cụm từ nào trên câu thoại để bật thanh nghe phát âm · Bấm loa 🔊/🐢 để nghe cả câu</span>
+<button type="button" onclick="playFullDialogue()" aria-label="Nghe trọn đoạn hội thoại" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950 text-slate-700 dark:text-slate-200 font-semibold">▶️ Nghe trọn hội thoại</button>
+</div>
+
+<!-- Danh sách từng lượt thoại & Sân tập ứng biến -->
+<div id="spk-dialogue-box" class="space-y-3"></div>
+</div>
+</section>
+</div>
+
+<!-- Modal Hướng dẫn làm quen nhanh (Quick Start Guide) -->
+<div id="guide-modal" role="dialog" aria-modal="true" aria-labelledby="guide-modal-title" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 max-w-xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl shrink-0" aria-hidden="true">🩺</div>
+<div>
+<h2 id="guide-modal-title" class="text-base sm:text-lg font-bold">Chào mừng tới Medical English ER!</h2>
+<p class="text-xs text-slate-500 dark:text-slate-400">Lộ trình làm quen 30 giây để luyện phản xạ đi thi cực nhanh</p>
+</div>
+</div>
+<button type="button" onclick="closeGuideModal()" aria-label="Đóng hộp thoại hướng dẫn" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200">✕</button>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+<div class="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/60 space-y-1">
+<div class="font-bold text-blue-700 dark:text-blue-300">1. 🔬 Soi X-Quang (Học quy luật)</div>
+<p class="text-slate-600 dark:text-slate-300 leading-relaxed">Chạm vào <b>từ khóa màu vàng</b> trong câu để soi dấu hiệu nhận biết Danh/Tính/Trạng/Động từ trước khi chọn đáp án.</p>
+</div>
+<div class="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 space-y-1">
+<div class="font-bold text-amber-700 dark:text-amber-300">2. ⚡ Cấp Cứu Quiz (Luyện tốc độ)</div>
+<p class="text-slate-600 dark:text-slate-300 leading-relaxed">Làm nhanh để tăng <b>XP + Chuỗi 🔥</b> và thăng hạng Cảnh giới. Hệ thống tự gom <i>"Bổ túc câu ngu"</i> nếu bạn sai lặp lại một dạng.</p>
+</div>
+<div class="p-3 rounded-xl bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200/80 dark:border-teal-800/60 space-y-1">
+<div class="font-bold text-teal-700 dark:text-teal-300">3. 🗂️ Kho Từ & Bẫy (Tra cứu nhanh)</div>
+<p class="text-slate-600 dark:text-slate-300 leading-relaxed">Lọc từ vựng theo đuôi từ, thủ thuật mổ hoặc <b>4 bẫy kinh điển</b>. Bấm trực tiếp vào từng từ để nghe phát âm chuẩn Mỹ.</p>
+</div>
+<div class="p-3 rounded-xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 space-y-1">
+<div class="font-bold text-purple-700 dark:text-purple-300">4. 🎙️ Kho Speaking (Thực chiến <span id="guide-spk-count">13</span> bài)</div>
+<p class="text-slate-600 dark:text-slate-300 leading-relaxed">Chọn <b>Vai A/B</b>, chuyển dần sang <b>Che hết</b>, bôi đen cụm từ bất kỳ để nghe lẻ, hoặc gõ/nói thử để lưu vào <b>Sổ tay câu tủ</b>.</p>
+</div>
+</div>
+
+<div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-xs text-slate-600 dark:text-slate-300 flex items-start gap-2">
+<span class="text-base shrink-0" aria-hidden="true">☁️</span>
+<div><b>Mẹo giữ điểm:</b> Máy tự lưu trên trình duyệt này. Nếu đổi điện thoại/máy tính, bấm <b>Đồng bộ máy khác</b> và dùng chung 1 mã cá nhân dài/khó đoán.</div>
+</div>
+
+<div class="flex flex-wrap items-center justify-end gap-2 pt-1">
+<button type="button" onclick="closeGuideModal()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-sm">🚀 Đã hiểu, bắt đầu luyện ngay!</button>
+</div>
+</div>
+</div>
+
+<!-- Thanh công cụ nổi khi bôi đen từ/cụm từ (Highlight-to-Listen) -->
+<div id="highlight-toolbar" role="toolbar" aria-label="Công cụ nghe cụm từ được chọn" class="hidden fixed z-50 bg-slate-900 text-white px-2.5 py-1.5 rounded-xl shadow-xl border border-slate-700 flex items-center gap-1.5 text-xs">
+<button type="button" onclick="speakHighlighted(0.95)" class="px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 font-semibold">🔊 Nghe cụm này</button>
+<button type="button" onclick="speakHighlightedSlowWords()" class="px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 font-semibold">🐢 Đọc chậm từng chữ</button>
+</div>
+
+<!-- Modal Sổ tay câu tủ (My Phrasebook) -->
+<div id="phrasebook-modal" role="dialog" aria-modal="true" aria-labelledby="phrasebook-title" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-5 max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-xl space-y-3">
+<div class="flex items-center justify-between">
+<h2 id="phrasebook-title" class="text-base font-bold">📒 Sổ tay câu tủ cá nhân (My Phrasebook)</h2>
+<button type="button" onclick="document.getElementById('phrasebook-modal').classList.add('hidden')" aria-label="Đóng sổ tay câu tủ" class="text-xs px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800">✕</button>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">Tổng hợp các câu ứng biến ngắn gọn do chính bạn viết/nói đạt yêu cầu để ôn tủ trước giờ thi.</p>
+<div id="phrasebook-list" class="space-y-2 max-h-80 overflow-y-auto pr-1"></div>
+</div>
+</div>
+
+<div id="cloud-modal" role="dialog" aria-modal="true" aria-labelledby="cloud-modal-title" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-5 max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-xl space-y-3">
+<div class="flex items-center justify-between">
+<h2 id="cloud-modal-title" class="text-base font-bold">☁️ Đồng bộ tiến trình trên nhiều thiết bị</h2>
+<button type="button" onclick="closeCloudModal()" aria-label="Đóng hộp thoại đồng bộ" class="text-xs px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800">✕</button>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Nhập tên hoặc biệt danh của bạn (ví dụ: <b>Quân</b>, <b>Vĩ</b>, <b>Minh_K52</b>) để lưu và tải lại tiến trình trên điện thoại hay máy tính.</p>
+<div class="flex gap-1.5">
+<input id="cloud-code-input" type="text" aria-label="Mã đồng bộ cá nhân" placeholder="Nhập tên hoặc mã cá nhân của bạn..." class="flex-1 min-w-0 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none focus:border-blue-500">
+<button type="button" onclick="generateRandomSyncCode()" aria-label="Gợi ý mã ngẫu nhiên" class="px-2.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold shrink-0">🎲 Gợi ý mã</button>
+</div>
+<div id="cloud-restore-old-wrap" class="hidden flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-xs">
+<span class="text-slate-600 dark:text-slate-300 truncate">Mã đang lưu trên máy: <b id="cloud-saved-preview"></b></span>
+<button type="button" onclick="restoreSavedSyncCode()" class="shrink-0 text-blue-600 dark:text-blue-400 font-semibold hover:underline">↩️ Dùng lại mã cũ</button>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-1">
+<button type="button" onclick="syncSaveToCloud()" class="py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold">⬆️ Lưu lên đám mây</button>
+<button type="button" onclick="requestSyncLoad()" class="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold">⬇️ Tải về máy này</button>
+</div>
+<div id="cloud-confirm-box" class="hidden p-3 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 space-y-2">
+<div class="font-semibold">⚠️ Dữ liệu tải về sẽ ghi đè toàn bộ XP, chuỗi đúng và câu tủ hiện tại trên máy này. Bạn chắc chắn chứ?</div>
+<div class="flex justify-end gap-2">
+<button type="button" onclick="cancelSyncLoad()" class="px-3 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-semibold">Hủy</button>
+<button type="button" onclick="syncLoadFromCloud()" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Xác nhận tải về</button>
+</div>
+</div>
+<div id="cloud-msg" role="status" aria-live="polite" class="text-xs font-medium text-slate-600 dark:text-slate-300 min-h-[18px]"></div>
+</div>
+</div>
+
+<!-- Màn hình Điện tâm đồ (ECG) tổng kết chu kỳ 50 câu -->
+<div id="ecg-modal" role="dialog" aria-modal="true" aria-labelledby="ecg-modal-title" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="bg-slate-900 border-2 border-rose-500/70 rounded-2xl p-5 max-w-lg w-full text-slate-100 shadow-2xl overflow-hidden">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" aria-hidden="true"></span><span id="ecg-modal-title" class="text-xs font-bold uppercase tracking-wider text-rose-400">ECG Monitor · Tổng kết 50 câu</span></div>
+<span id="ecg-rate-badge" class="text-xs font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">0/50 đúng</span>
+</div>
+<div class="bg-slate-950 rounded-xl p-2 border border-slate-800 mb-3 relative overflow-hidden">
+<svg viewBox="0 0 460 90" aria-hidden="true" class="w-full h-20">
+<path d="M0 45 L30 45 L40 45 L46 20 L52 72 L58 10 L65 62 L71 45 L105 45 L112 24 L118 68 L124 14 L131 58 L137 45 L175 45 L182 32 L188 55 L194 45 L460 45" fill="none" stroke="#f43f5e" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" class="ecg-line"/>
+</svg>
+<div class="text-xs font-mono text-rose-400/90 text-right pr-1">ASYSTOLE — CẦN CẤP CỨU KIẾN THỨC</div>
+</div>
+<div id="ecg-summary-body" class="panel-pull space-y-3"></div>
+</div>
+</div>
+
+<!-- Canvas bắn pháo giấy 2 bên khi đạt chuỗi 100 -->
+<canvas id="confetti-canvas" aria-hidden="true" class="hidden fixed inset-0 z-50 pointer-events-none"></canvas>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBt6rROnho7-JBBGtaGrK6iO-rgo4BBsM0",
+  authDomain: "avcn-f01b5.firebaseapp.com",
+  projectId: "avcn-f01b5",
+  storageBucket: "avcn-f01b5.firebasestorage.app",
+  messagingSenderId: "831063574878",
+  appId: "1:831063574878:web:94e06e852fcd5f6981e7cf",
+  measurementId: "G-9GQZ0EDZWM"
+};
+
+let cloudDb = null, cloudAuth = null;
+const CLOUD_APP_ID = 'avcn-f01b5';
+const CLOUD_CODE_KEY = 'avcn_medical_er_cloud_code';
+
+function safeStorageGet(key) {
+  try { return localStorage.getItem(key) || ''; } catch (e) { return ''; }
+}
+function safeStorageSet(key, val) {
+  try { localStorage.setItem(key, val); } catch (e) {}
+}
+
+function initCloudBackend() {
+  try {
+    if (!FIREBASE_CONFIG || !FIREBASE_CONFIG.apiKey) return null;
+    const app = initializeApp(FIREBASE_CONFIG);
+    cloudAuth = getAuth(app);
+    cloudDb = getFirestore(app);
+    return { app, auth: cloudAuth, db: cloudDb };
+  } catch (e) {
+    return null;
+  }
+}
+
+async function ensureCloudAuth() {
+  if (!cloudAuth) initCloudBackend();
+  if (!cloudAuth) throw new Error('NO_CLOUD');
+  if (cloudAuth.currentUser) return cloudAuth.currentUser;
+  const cred = await signInAnonymously(cloudAuth);
+  return cred.user;
+}
+
+function normalizeCode(raw) {
+  return String(raw || '')
+    .normalize('NFC')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '_')
+    .replace(/[^\p{L}\p{N}_-]+/gu, '')
+    .slice(0, 60);
+}
+
+function updateHeaderSyncBadge(rawVal) {
+  const btn = document.getElementById('header-sync-btn');
+  if (!btn) return;
+  const code = normalizeCode(rawVal !== undefined ? rawVal : safeStorageGet(CLOUD_CODE_KEY));
+  btn.textContent = code ? `☁️ Đồng bộ (${code})` : '☁️ Đồng bộ máy khác';
+}
+
+window.generateRandomSyncCode = function() {
+  const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+  let suffix = '';
+  const arr = new Uint32Array(6);
+  if (window.crypto && window.crypto.getRandomValues) {
+    window.crypto.getRandomValues(arr);
+    for (let i = 0; i < 6; i++) suffix += chars[arr[i] % chars.length];
+  } else {
+    for (let i = 0; i < 6; i++) suffix += chars[Math.floor(Math.random() * chars.length)];
+  }
+  const newCode = 'med_' + suffix;
+  const inp = document.getElementById('cloud-code-input');
+  const msg = document.getElementById('cloud-msg');
+  const oldSaved = safeStorageGet(CLOUD_CODE_KEY);
+  const restoreWrap = document.getElementById('cloud-restore-old-wrap');
+  const savedPreview = document.getElementById('cloud-saved-preview');
+  if (inp) inp.value = newCode;
+  if (oldSaved && restoreWrap && savedPreview) {
+    savedPreview.textContent = oldSaved;
+    restoreWrap.classList.remove('hidden');
+  }
+  if (msg) msg.textContent = '🔑 Mã này chưa được lưu. Hãy bấm "⬆️ Lưu lên đám mây" nếu bạn muốn dùng mã mới này.';
+};
+
+window.restoreSavedSyncCode = function() {
+  const oldSaved = safeStorageGet(CLOUD_CODE_KEY);
+  const inp = document.getElementById('cloud-code-input');
+  const msg = document.getElementById('cloud-msg');
+  const restoreWrap = document.getElementById('cloud-restore-old-wrap');
+  if (inp && oldSaved) inp.value = oldSaved;
+  if (restoreWrap) restoreWrap.classList.add('hidden');
+  if (msg) msg.textContent = '📌 Đã khôi phục lại mã cá nhân đang lưu trên máy.';
+};
+
+window.openCloudModal = function() {
+  const modal = document.getElementById('cloud-modal');
+  const inp = document.getElementById('cloud-code-input');
+  const msg = document.getElementById('cloud-msg');
+  const confirmBox = document.getElementById('cloud-confirm-box');
+  const restoreWrap = document.getElementById('cloud-restore-old-wrap');
+  const saved = safeStorageGet(CLOUD_CODE_KEY);
+  inp.value = saved;
+  msg.textContent = saved ? '📌 Đã tự động điền mã cá nhân đã đồng bộ trên máy này.' : '';
+  if (confirmBox) confirmBox.classList.add('hidden');
+  if (restoreWrap) restoreWrap.classList.add('hidden');
+  modal.classList.remove('hidden');
+};
+
+window.closeCloudModal = function() {
+  document.getElementById('cloud-modal').classList.add('hidden');
+};
+
+window.requestSyncLoad = function() {
+  const inp = document.getElementById('cloud-code-input');
+  const msg = document.getElementById('cloud-msg');
+  const confirmBox = document.getElementById('cloud-confirm-box');
+  const code = normalizeCode(inp.value);
+  if (!code) {
+    msg.textContent = '⚠️ Vui lòng nhập mã cá nhân đã lưu trước đó.';
+    return;
+  }
+  msg.textContent = '';
+  if (confirmBox) confirmBox.classList.remove('hidden');
+};
+
+window.cancelSyncLoad = function() {
+  const confirmBox = document.getElementById('cloud-confirm-box');
+  if (confirmBox) confirmBox.classList.add('hidden');
+};
+
+window.syncSaveToCloud = async function() {
+  const inp = document.getElementById('cloud-code-input');
+  const msg = document.getElementById('cloud-msg');
+  const confirmBox = document.getElementById('cloud-confirm-box');
+  if (confirmBox) confirmBox.classList.add('hidden');
+  const code = normalizeCode(inp.value);
+  if (!code || code.length < 2) {
+    msg.textContent = '⚠️ Vui lòng nhập tên hoặc mã cá nhân (ít nhất 2 ký tự) trước khi lưu.';
+    return;
+  }
+  msg.textContent = '⏳ Đang đẩy tiến trình lên đám mây...';
+  try {
+    const user = await ensureCloudAuth();
+    const ref = doc(cloudDb, 'artifacts', CLOUD_APP_ID, 'public', 'data', 'user_progress', code);
+    const snapshot = window.exportProgressSnapshot ? window.exportProgressSnapshot() : {};
+    await setDoc(ref, {
+      code,
+      ownerUid: user.uid,
+      updatedAt: Date.now(),
+      stateJson: JSON.stringify(snapshot)
+    });
+    safeStorageSet(CLOUD_CODE_KEY, code);
+    updateHeaderSyncBadge(code);
+    const restoreWrap = document.getElementById('cloud-restore-old-wrap');
+    if (restoreWrap) restoreWrap.classList.add('hidden');
+    msg.textContent = `✅ Đã lưu lên đám mây và ghi nhớ mã "${code}" trên máy này!`;
+  } catch (err) {
+    if (err && err.message === 'NO_CLOUD') {
+      msg.textContent = '⚠️ Dịch vụ lưu trực tuyến chưa sẵn sàng.';
+    } else {
+      msg.textContent = '❌ Không thể kết nối đám mây lúc này. Hãy thử lại sau.';
+    }
+  }
+};
+
+window.syncLoadFromCloud = async function() {
+  const inp = document.getElementById('cloud-code-input');
+  const msg = document.getElementById('cloud-msg');
+  const confirmBox = document.getElementById('cloud-confirm-box');
+  if (confirmBox) confirmBox.classList.add('hidden');
+  const code = normalizeCode(inp.value);
+  if (!code) {
+    msg.textContent = '⚠️ Vui lòng nhập mã cá nhân đã lưu trước đó.';
+    return;
+  }
+  msg.textContent = '⏳ Đang tải tiến trình từ đám mây...';
+  try {
+    await ensureCloudAuth();
+    const ref = doc(cloudDb, 'artifacts', CLOUD_APP_ID, 'public', 'data', 'user_progress', code);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      msg.textContent = `⚠️ Không tìm thấy dữ liệu nào cho mã "${code}".`;
+      return;
+    }
+    const data = snap.data();
+    const parsed = JSON.parse(data.stateJson || '{}');
+    if (window.importProgressSnapshot) {
+      window.importProgressSnapshot(parsed);
+    }
+    safeStorageSet(CLOUD_CODE_KEY, code);
+    updateHeaderSyncBadge(code);
+    const restoreWrap = document.getElementById('cloud-restore-old-wrap');
+    if (restoreWrap) restoreWrap.classList.add('hidden');
+    msg.textContent = `✅ Đã tải và khôi phục tiến trình cho mã "${code}"!`;
+  } catch (err) {
+    if (err && err.message === 'NO_CLOUD') {
+      msg.textContent = '⚠️ Dịch vụ lưu trực tuyến chưa sẵn sàng.';
+    } else {
+      msg.textContent = '❌ Lỗi tải dữ liệu từ đám mây. Hãy kiểm tra lại kết nối.';
+    }
+  }
+};
+
+initCloudBackend();
+const initialSavedCode = safeStorageGet(CLOUD_CODE_KEY);
+if (initialSavedCode) {
+  const initInp = document.getElementById('cloud-code-input');
+  if (initInp) initInp.value = initialSavedCode;
+  updateHeaderSyncBadge(initialSavedCode);
+}
+</script>
+
+<script>
+const STORAGE_KEY = 'avcn_medical_er_v2_progress';
+const GUIDE_SEEN_KEY = 'avcn_medical_er_guide_seen';
+
+function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function safeDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+const TIERS = [
+  { name: 'Con Người', minXp: 0, maxS: Infinity },
+  { name: 'Nhân Vật Alime', minXp: 1000, maxS: 8 },
+  { name: 'Nhân Vật Bá Khí', minXp: 3500, maxS: 5.5 },
+  { name: 'Quỷ S*x', minXp: 8000, maxS: 3.8 },
+  { name: 'Đại Thống Khổ', minXp: 15000, maxS: 2.6 },
+  { name: 'Hóa Thần Dinh Dưỡng K52', minXp: 25000, maxS: 1.8 }
+];
+
+const XRAY = [
+  { u: 'Unit 15 · Phẫu thuật', m: 'Sau mạo từ "the" là Danh từ → operation (ca mổ).', p: [{ t: 'After ' }, { t: 'the', s: 1, c: 'Mạo từ "the" trước chỗ trống → cần DANH TỪ.' }, { b: 1, a: 'operation', o: ['operate (V)', 'operation (N)', 'operative (Adj)'] }, { t: ', you ' }, { t: 'will', s: 1, c: '"will + V0" diễn tả sự việc chắc chắn sau mổ.' }, { t: ' awake in the recovery room.' }] },
+  { u: 'Unit 10 · Tiêm thuốc', m: 'Sau "must" là Động từ nguyên mẫu → administer.', p: [{ t: 'Nurses ' }, { t: 'must', s: 1, c: 'Sau "must" dùng ĐỘNG TỪ NGUYÊN MẪU.' }, { b: 1, a: 'administer', o: ['administer (V)', 'administration (N)', 'administrative (Adj)'] }, { t: ' injections under ' }, { t: 'supervision', s: 1, c: 'Đuôi -sion là danh từ (sự giám sát).' }, { t: '.' }] },
+  { u: 'Unit 6 · Cấp cứu', m: 'Sau linking verb "appears" dùng Tính từ → bruised.', p: [{ t: 'The patient’s left ankle ' }, { t: 'appears', s: 1, c: '"appears" là linking verb → cần TÍNH TỪ.' }, { b: 1, a: 'bruised', o: ['bruise (V/N)', 'bruised (Adj)', 'bruising (N)'] }, { t: ' and swollen.' }] },
+  { u: 'Unit 14 · Cấp phát thuốc', m: 'Bổ nghĩa động từ "administered" → Trạng từ -ly (orally).', p: [{ t: 'Oral medications are ' }, { t: 'administered', s: 1, c: 'Bổ nghĩa cho động từ → cần TRẠNG TỪ -ly.' }, { b: 1, a: 'orally', o: ['oral (Adj)', 'orally (Adv)', 'orality (N)'] }, { t: '.' }] },
+  { u: 'Unit 9 · Hô hấp', m: 'Trước danh từ "tubes" cần Tính từ → bronchial.', p: [{ t: 'Asthma causes narrowing of the ' }, { b: 1, a: 'bronchial', o: ['bronchus (N)', 'bronchial (Adj)', 'bronchitis (N)'] }, { t: ' ' }, { t: 'tubes', s: 1, c: 'Danh từ "tubes" cần TÍNH TỪ bổ nghĩa phía trước.' }, { t: '.' }] },
+  { u: 'Unit 7 · Chấn thương', m: 'Bẫy giả định sau "require that" → be reset (không chia is).', p: [{ t: 'Compound fractures ' }, { t: 'require that', s: 1, c: 'Sau "require that" dùng thức giả định: S + be + V3/ed.' }, { t: ' the bone ' }, { b: 1, a: 'be reset', o: ['is reset', 'be reset', 'was reset'] }, { t: ' before it can heal.' }] },
+  { u: 'Unit 15 · Tâm lý trước mổ', m: 'Cấu trúc "It is + adj + (for sb) + to V0" → to feel.', p: [{ t: 'It is ' }, { t: 'important', s: 1, c: 'Mẫu "It is + adj + for sb + to V0".' }, { t: ' for you ' }, { b: 1, a: 'to feel', o: ['feeling', 'to feel', 'felt'] }, { t: ' calm before the procedure.' }] },
+  { u: 'Unit 6 · Triệu chứng', m: '"Lately" + "for two days" → Hiện tại hoàn thành (have had).', p: [{ t: 'Lately, I ' }, { b: 1, a: 'have had', o: ['had', 'have had', 'will have'] }, { t: ' persistent abdominal pains ' }, { t: 'for two days', s: 1, c: '"for + khoảng thời gian" → Hiện tại hoàn thành.' }, { t: '.' }] }
+];
+
+const QUIZ = [
+  { t: 'Vị trí & Đuôi từ', q: 'The anesthesiologist will closely _______ the patient’s vital signs.', h: 'Sau "will closely" cần ĐỘNG TỪ NGUYÊN MẪU.', o: ['monitor', 'monitoring', 'monitored', 'monitors'], a: 0, e: '"monitor" sau "will" là động từ nguyên mẫu (theo dõi).' },
+  { t: 'Bẫy -ed / -ing', q: 'After the fall, the athlete’s ankle appeared severely _______.', h: 'Sau linking verb "appeared" cần TÍNH TỪ.', o: ['swell', 'swelling', 'swollen', 'swells'], a: 2, e: '"swollen" (bị sưng) là tính từ đứng sau linking verb.' },
+  { t: 'Thì Y khoa', q: 'The patient _______ persistent pain for three days before coming to the ER.', h: '"for three days" → Hiện tại hoàn thành.', o: ['has had', 'have', 'will have', 'having'], a: 0, e: 'Có "for + thời gian" → dùng Hiện tại hoàn thành (has had).' },
+  { t: 'Danh từ quá trình', q: 'Proper wound care speeds up the _______ process.', h: 'Giữa "the" và "process" cần DANH TỪ chỉ quá trình.', o: ['heal', 'healed', 'healing', 'healer'], a: 2, e: '"healing process" (quá trình lành vết thương).' },
+  { t: 'Bẫy require that', q: 'Comminuted fractures require that the bone _______ repositioned.', h: 'Thức giả định sau "require that" → V0 không chia.', o: ['is', 'was', 'be', 'being'], a: 2, e: 'Sau "require that" luôn dùng "be + V3/ed".' },
+  { t: 'Sau mạo từ', q: 'The surgeon made a small _______ above the appendix.', h: 'Sau "a small" cần DANH TỪ đếm được.', o: ['incise', 'incision', 'incisive', 'incising'], a: 1, e: 'Đuôi -sion: "incision" (vết rạch mổ).' },
+  { t: 'Điều kiện Y khoa', q: 'If a donor _______ type O negative blood, they are a universal donor.', h: 'Mệnh đề If không dùng "will", chia Hiện tại đơn.', o: ['will have', 'has', 'had', 'having'], a: 1, e: 'Vế If chia Hiện tại đơn với chủ ngữ số ít → "has".' },
+  { t: 'Trạng từ -ly', q: 'Antibiotics are typically administered _______ for mild infections.', h: 'Bổ nghĩa cho động từ "administered" → TRẠNG TỪ -ly.', o: ['oral', 'orally', 'orality', 'orals'], a: 1, e: '"orally" (qua đường uống) là trạng từ.' },
+  { t: 'Tính từ chuyên khoa', q: 'Asthma causes narrowing of the _______ tubes.', h: 'Trước danh từ "tubes" cần TÍNH TỪ -al.', o: ['bronchus', 'bronchial', 'bronchitis', 'bronchi'], a: 1, e: '"bronchial tubes" (ống phế quản).' },
+  { t: 'It is + adj', q: 'It is vital for staff _______ sterile equipment during every procedure.', h: 'Khung "It is + adj + for sb + to V0".', o: ['use', 'using', 'to use', 'used'], a: 2, e: 'Sau "It is + adj + for sb" dùng "to + V0".' },
+  { t: 'Động từ -fy', q: 'Lab technicians use tests to _______ specific pathogens.', h: 'Sau "to" chỉ mục đích → ĐỘNG TỪ V0.', o: ['identification', 'identifiable', 'identify', 'identified'], a: 2, e: 'Đuôi -fy: "identify" (nhận diện).' },
+  { t: 'Thì tương lai', q: 'Post-op recovery _______ regular physical therapy.', h: 'Dự báo sau mổ (post-op) → Tương lai đơn.', o: ['will involve', 'involved', 'involving', 'was involving'], a: 0, e: 'Dự báo kế hoạch sau mổ dùng "will + V0".' },
+  { t: 'Danh từ sau Adj', q: 'The nurse observed noticeable _______ around the wrist.', h: 'Sau tính từ "noticeable" cần DANH TỪ.', o: ['swelling', 'swell', 'swollen', 'swells'], a: 0, e: '"swelling" (sự sưng tấy) là danh từ.' },
+  { t: 'Sau linking verb', q: 'Patients often feel _______ before general anesthesia.', h: 'Sau "feel" mô tả cảm xúc → TÍNH TỪ.', o: ['nervous', 'nervously', 'nerve', 'nervousness'], a: 0, e: '"nervous" (lo lắng) là tính từ.' },
+  { t: 'Danh từ chỉ người', q: 'A blood _______ must meet strict criteria before giving blood.', h: 'Sau "A blood" cần DANH TỪ chỉ người.', o: ['donor', 'donate', 'donation', 'donating'], a: 0, e: '"donor" (người hiến máu).' },
+  { t: 'Bệnh viêm -itis', q: 'Acute _______ requires prompt evaluation to avoid rupture.', h: 'Sau tính từ "Acute" cần tên bệnh viêm (-itis).', o: ['appendicitis', 'appendiceal', 'appendectomy', 'appendices'], a: 0, e: '"appendicitis" (viêm ruột thừa).' },
+  { t: 'Tính từ hô hấp', q: 'Asthma primarily affects the _______ airway passages.', h: 'Trước cụm danh từ cần TÍNH TỪ.', o: ['respiratory', 'respire', 'respiration', 'respirator'], a: 0, e: '"respiratory" (thuộc hô hấp).' },
+  { t: 'Trạng từ cách thức', q: 'The surgeon explained the instructions _______ to the family.', h: 'Bổ nghĩa cho động từ "explained" → TRẠNG TỪ.', o: ['clearly', 'clear', 'clarity', 'clarify'], a: 0, e: '"clearly" (rõ ràng) bổ nghĩa cho động từ.' },
+  { t: 'Hiện tại đơn', q: 'Red blood cells _______ oxygen from the lungs to tissues.', h: 'Chức năng sinh lý + chủ ngữ số nhiều → V0.', o: ['carry', 'carries', 'carried', 'carrying'], a: 0, e: 'Chức năng sinh học chia Hiện tại đơn → "carry".' },
+  { t: 'Quá khứ đơn', q: 'The paramedic _______ a sterile dressing at the scene.', h: 'Sự việc đã xảy ra tại hiện trường → Quá khứ đơn.', o: ['applied', 'applies', 'applying', 'apply'], a: 0, e: 'Tường thuật sơ cứu đã làm → "applied".' },
+  { t: 'Hiện tại hoàn thành', q: 'The patient _______ severe headaches since Monday.', h: '"since + mốc thời gian" → Hiện tại hoàn thành.', o: ['has experienced', 'experienced', 'experiences', 'experiencing'], a: 0, e: 'Có "since" → "has experienced".' },
+  { t: 'Mệnh đề While', q: '_______ some clotting is necessary, clotting in vessels is dangerous.', h: 'Từ nối đầu câu chỉ sự tương phản (Mặc dù).', o: ['While', 'Because', 'Unless', 'Therefore'], a: 0, e: '"While" đầu câu nghĩa là "Mặc dù / Trong khi".' }
+];
+
+const GENS = [
+  () => {
+    const subs = ['The surgical team', 'The attending physician', 'The ER nurse', 'The resident doctor', 'The specialist', 'The clinical intern'];
+    const verbs = ['documented', 'evaluated', 'recorded', 'noted', 'monitored', 'reviewed'];
+    const nouns = [
+      ['transfusion', 'transfuse', 'transfusable', 'transfusively', 'sự truyền máu', 'a blood'],
+      ['incision', 'incise', 'incisive', 'incisively', 'vết rạch mổ', 'the abdominal'],
+      ['inflammation', 'inflame', 'inflammatory', 'inflammatorily', 'tình trạng viêm', 'local'],
+      ['dislocation', 'dislocate', 'dislocatable', 'dislocatively', 'sự trật khớp', 'a shoulder'],
+      ['concussion', 'concuss', 'concussive', 'concussively', 'chấn động não', 'a mild'],
+      ['injection', 'inject', 'injectable', 'injectively', 'mũi tiêm thuốc', 'an intravenous'],
+      ['medication', 'medicate', 'medicinal', 'medicinally', 'thuốc điều trị', 'the prescribed'],
+      ['supervision', 'supervise', 'supervisory', 'supervisorily', 'sự giám sát', 'close clinical'],
+      ['assessment', 'assess', 'assessable', 'assessably', 'sự đánh giá', 'the initial'],
+      ['cholecystectomy', 'cholecysto-', '-ectomy', '-ostomy', 'ca cắt túi mật', 'an urgent']
+    ];
+    const locs = ['in the patient chart.', 'before the operation.', 'during morning rounds.', 'in the recovery unit.', 'prior to discharge.', 'on the medical record.'];
+    const s = subs[Math.floor(Math.random() * subs.length)], v = verbs[Math.floor(Math.random() * verbs.length)], x = nouns[Math.floor(Math.random() * nouns.length)], l = locs[Math.floor(Math.random() * locs.length)];
+    return { t: 'Danh từ (N)', q: `${s} ${v} ${x[5]} _______ ${l}`, h: `Sau cụm "${x[5]}" cần một DANH TỪ.`, o: [x[0], x[1], x[2], x[3]], a: 0, e: `"${x[0]}" (${x[4]}) là danh từ đứng sau cụm từ hạn định.` };
+  },
+  () => {
+    const subjects = ['the injured joint', 'the surgical site', 'the patient’s ankle', 'the affected tissue', 'the lower limb', 'the post-op wound'];
+    const linkers = ['appeared', 'looked', 'became', 'remained', 'seemed', 'felt'];
+    const adjs = [
+      ['swollen', 'swelling', 'swell', 'swellingly', 'bị sưng phù'],
+      ['bruised', 'bruising', 'bruise', 'bruisingly', 'bị bầm tím'],
+      ['inflamed', 'inflammation', 'inflame', 'inflammatorily', 'bị viêm đỏ'],
+      ['displaced', 'displace', 'displacement', 'displacingly', 'bị di lệch'],
+      ['damaged', 'damage', 'damaging', 'damagingly', 'bị tổn thương'],
+      ['infected', 'infection', 'infect', 'infectiously', 'bị nhiễm trùng'],
+      ['complicated', 'complicate', 'complication', 'complicatedly', 'trở nên phức tạp'],
+      ['stable', 'stabilize', 'stability', 'stably', 'ổn định']
+    ];
+    const tails = ['during physical exam.', 'after the trauma.', 'two hours post-op.', 'upon ER arrival.', 'despite initial icing.', 'during follow-up.'];
+    const sb = subjects[Math.floor(Math.random() * subjects.length)], lk = linkers[Math.floor(Math.random() * linkers.length)], x = adjs[Math.floor(Math.random() * adjs.length)], tl = tails[Math.floor(Math.random() * tails.length)];
+    return { t: 'Tính từ (Adj)', q: `On inspection, ${sb} ${lk} _______ ${tl}`, h: `Sau linking verb "${lk}" cần một TÍNH TỪ mô tả trạng thái.`, o: [x[0], x[1], x[2], x[3]], a: 0, e: `"${x[0]}" (${x[4]}) là tính từ đứng sau động từ nối "${lk}".` };
+  },
+  () => {
+    const items = [
+      ['orally', 'oral', 'orality', 'oralize', 'qua đường uống', 'The antibiotic is taken'],
+      ['temporarily', 'temporary', 'temporariness', 'temporize', 'tạm thời', 'The splint was applied'],
+      ['carefully', 'careful', 'carefulness', 'care', 'một cách cẩn thận', 'The dosage was checked'],
+      ['lately', 'late', 'lateness', 'belate', 'gần đây', 'The chest discomfort has worsened'],
+      ['frequently', 'frequent', 'frequency', 'frequented', 'thường xuyên', 'Vital signs are checked'],
+      ['intravenously', 'intravenous', 'intravenosity', 'venous', 'qua đường tĩnh mạch', 'Fluids were administered'],
+      ['promptly', 'prompt', 'promptness', 'prompted', 'kịp thời', 'The bleeding was controlled'],
+      ['gradually', 'gradual', 'graduality', 'graduated', 'dần dần', 'The swelling subsided']
+    ];
+    const contexts = ['in the emergency ward.', 'by the duty nurse.', 'according to protocol.', 'over the past week.', 'after the procedure.', 'to prevent complications.'];
+    const x = items[Math.floor(Math.random() * items.length)], c = contexts[Math.floor(Math.random() * contexts.length)];
+    return { t: 'Trạng từ (Adv)', q: `${x[5]} _______ ${c}`, h: 'Bổ nghĩa cho động từ/mệnh đề → dùng TRẠNG TỪ đuôi -ly.', o: [x[0], x[1], x[2], x[3]], a: 0, e: `"${x[0]}" (${x[4]}) là trạng từ bổ nghĩa cho hành động.` };
+  },
+  () => {
+    const cases = [
+      ['has persisted', ['persisted', 'persists', 'persisting'], 'for four consecutive days', 'Hiện tại hoàn thành (for + thời gian)', 'The abdominal pain'],
+      ['will awake', ['awoke', 'awakes', 'awaking'], 'in the recovery room after anesthesia', 'Tương lai đơn (dự báo sau mổ)', 'The patient'],
+      ['administered', ['administers', 'has administered', 'will administer'], 'epinephrine immediately upon arrival', 'Quá khứ đơn (sự việc đã xảy ra)', 'The ER team'],
+      ['carries', ['carry', 'carried', 'carrying'], 'oxygenated blood from the left ventricle', 'Hiện tại đơn (sự thật sinh lý)', 'The aorta'],
+      ['has improved', ['improved', 'improves', 'improving'], 'significantly since yesterday morning', 'Hiện tại hoàn thành (since + mốc thời gian)', 'The patient’s breathing'],
+      ['underwent', ['undergoes', 'has undergone', 'will undergo'], 'an emergency appendectomy last night', 'Quá khứ đơn (last night)', 'The young man']
+    ];
+    const x = cases[Math.floor(Math.random() * cases.length)];
+    return { t: 'Thì động từ', q: `${x[4]} _______ ${x[2]}.`, h: `Chú ý cụm thời gian/ngữ cảnh: "${x[2]}".`, o: [x[0], ...x[1]], a: 0, e: `"${x[0]}" chia đúng thì ${x[3]}.` };
+  },
+  () => {
+    const traps = [
+      { t: 'Bẫy cấu trúc', q: 'Severe compound fractures require that the limb _______ immobilized immediately.', h: 'Thức giả định sau "require that" → be + V3/ed (không chia is/was).', o: ['be', 'is', 'was', 'being'], a: 0, e: 'Sau "require that", động từ luôn giữ nguyên mẫu "be + V3/ed".' },
+      { t: 'Bẫy cấu trúc', q: 'It is essential for junior doctors _______ sterile gloves before suturing.', h: 'Mẫu câu "It is + adj + for sb + to V0".', o: ['to wear', 'wearing', 'wear', 'wore'], a: 0, e: 'Sau cấu trúc "It is + tính từ + for sb" luôn là "to + V0".' },
+      { t: 'Bẫy cấu trúc', q: '_______ mild bruising is common, severe swelling requires an X-ray.', h: 'Từ nối đầu câu mang nghĩa tương phản "Mặc dù".', o: ['While', 'Unless', 'Therefore', 'Because'], a: 0, e: '"While" đứng đầu câu tạo mệnh đề tương phản ("Mặc dù...").' },
+      { t: 'Bẫy cấu trúc', q: 'If a patient _______ allergic to penicillin, prescribe an alternative antibiotic.', h: 'Mệnh đề "If" trong câu điều kiện loại 1 chia Hiện tại đơn.', o: ['is', 'will be', 'was', 'being'], a: 0, e: 'Vế "If" không dùng "will", chia Hiện tại đơn → "is".' }
+    ];
+    return traps[Math.floor(Math.random() * traps.length)];
+  }
+];
+
+const VOCAB = [
+  { y: 'N', s: '-tion / -sion', w: 'operation (ca mổ), incision (vết rạch), transfusion (truyền máu), inflammation (viêm), dislocation (trật khớp), concussion (chấn động não), injection (tiêm)', r: 'Sau a/the/your, tính từ hoặc làm chủ ngữ.' },
+  { y: 'N', s: '-ist / -er / -or', w: 'anesthesiologist (BS gây mê), practitioner (người hành nghề), donor (người hiến), inhaler (ống hít)', r: 'Chỉ người chuyên môn hoặc dụng cụ y tế.' },
+  { y: 'N', s: '-ing / -ure / -itis', w: 'repositioning (nắn chỉnh xương), bruising (bầm tím), healing (lành vết thương), fracture (gãy xương), suture (chỉ khâu), procedure (thủ thuật), appendicitis (viêm ruột thừa)', r: 'Đuôi -ing sau mạo từ/tính từ là danh từ chỉ quá trình; -itis là bệnh viêm.' },
+  { y: 'J', s: '-al / -ical / -ive / -ory', w: 'surgical, medical, abdominal (bụng), bronchial (phế quản), circulatory (tuần hoàn), respiratory (hô hấp), pulmonary (phổi), preventive (dự phòng · cũng viết preventative)', r: 'Trước danh từ hoặc sau động từ to-be.' },
+  { y: 'J', s: '-ed / -en (Tính từ trạng thái)', w: 'bruised (bầm tím), swollen (sưng phù), displaced (di lệch), comminuted (vỡ vụn), inflamed (bị viêm), licensed (được cấp phép)', r: 'Đứng trước N hoặc sau linking verb (appear/feel/look) — phân biệt với động từ V-ed chia thì quá khứ.' },
+  { y: 'A', s: '-ly (Trạng từ)', w: 'orally (qua đường uống), carefully (cẩn thận), frequently (thường xuyên), temporarily (tạm thời), lately (gần đây), gradually (dần dần), quickly (nhanh chóng)', r: 'Bổ nghĩa động từ thường hoặc đầu câu + phẩy. Ngoại lệ: friendly, elderly, likely có đuôi -ly nhưng là Tính từ.' },
+  { y: 'V', s: '-ate / -ize / -fy / -er', w: 'donate (hiến), analyze (phân tích), identify (nhận diện), modify (điều chỉnh), administer (cấp phát/tiêm), monitor (theo dõi), suffer (chịu đựng)', r: 'Cẩn thận administer, monitor, suffer đuôi -er nhưng là động từ!' },
+  { y: 'SURG', s: '🔪 Cấu tạo từ phẫu thuật (Word Analysis)', w: 'cholecystectomy (cắt bỏ túi mật), cholecysto- (gallbladder · túi mật), -ectomy (excision / removal · cắt bỏ)', r: 'Ghép Gốc cơ quan (Root) + Hậu tố thủ thuật (Suffix) để suy luận nghĩa.' },
+  { y: 'SURG', s: '🔪 8 Hậu tố thủ thuật (Suffixes)', w: '-ectomy (removal · cắt bỏ), -otomy (surgical incision · rạch/mở), -ostomy (artificial opening · tạo lỗ mở thông), -r(h)aphy (suture, stitching · khâu nối), -oscopy (keyhole surgery · nội soi), -lithotomy (removal of calculi · mổ lấy sỏi), -pexy (fixation · cố định), -plasty (shaping · tạo hình)', r: 'Phân biệt: -ectomy (cắt bỏ), -otomy (rạch vào), -ostomy (tạo lỗ thông).' },
+  { y: 'SURG', s: '🏥 Thuật ngữ phẫu thuật (Terms)', w: 'appendectomy (removal of the appendix · cắt ruột thừa), laparoscopy (keyhole surgery in abdomen/pelvis with camera · nội soi ổ bụng), colostomy (creating an opening for colon through abdomen · mở hậu môn nhân tạo)', r: 'Các thuật ngữ kết thúc bằng hậu tố thủ thuật đều là DANH TỪ (N).' },
+  { y: 'TRAP', s: '⚠️ Bẫy -ed & -ing', w: 'appears bruised (Adj) vs suffered trauma (V2) · the healing process (N)', r: 'Sau linking verb là Adj; sau a/the là N.' },
+  { y: 'TRAP', s: '⚠️ Bẫy Cấu trúc', w: 'require that + S + be V3 · It is + adj + (for sb) + to V0 · While + mệnh đề (Mặc dù)', r: 'Không chia is/was sau require that; không dùng V-ing sau It is + adj.' }
+];
+
+const SPEAKING_UNITS = [
+  {
+    id: 'b1u1', code: 'B1 · U1', title: 'Blood (Nhóm máu & Truyền máu)', cat: 'CLINIC',
+    place: 'Khu ghế lấy máu, quá trình hiến máu gần hoàn tất',
+    roleA: 'Y tá — Dứt khoát, giải thích rõ quy tắc an toàn',
+    roleB: 'Người hiến (Ms. Yuang) — Tò mò, lo ngại nhầm nhóm máu',
+    kw3: ['Type B', 'B & AB', 'fatal (tử vong)'],
+    radar: ['Bước 1: Báo lấy máu sắp xong & đính chính nhóm máu B chỉ hợp B và AB.', 'Bước 2: Giải thích truyền nhầm nhóm máu rất nguy hiểm, có thể gây tử vong.', 'Bước 3: Cam kết dán nhãn và lưu hồ sơ cẩn thận.'],
+    a1: ['compatible → safe to give / matches', 'transfusion → giving blood', 'fatal → can cause death'],
+    lines: [
+      { r: 'A', en: "We're almost done taking your blood, Ms. Yuang.", vi: 'Chúng tôi sắp lấy máu xong cho cô rồi, cô Yuang.', kw: ['almost done', 'blood'], task: 'Báo sắp lấy máu xong cho cô Yuang.' },
+      { r: 'B', en: 'Okay. So, could anyone receive my blood?', vi: 'Vâng. Vậy bất kỳ ai cũng có thể nhận máu của tôi đúng không?', kw: ['anyone', 'receive'], task: 'Hỏi xem ai cũng nhận được máu của mình phải không.' },
+      { r: 'A', en: "No. Your blood is Type B, which means that it's only compatible with other people who have Types B and AB. We can't give your blood to someone with Type O or A.", vi: 'Không. Máu của cô là nhóm B, chỉ tương thích với người nhóm B và AB. Không thể truyền cho nhóm O hoặc A.', kw: ['Type B', 'B', 'AB'], task: 'Giải thích nhóm B chỉ hợp với B và AB, không truyền cho O/A.' },
+      { r: 'B', en: 'What happens if someone gets a transfusion with the wrong type?', vi: 'Chuyện gì xảy ra nếu ai đó bị truyền nhầm nhóm máu?', kw: ['wrong type', 'happens'], task: 'Hỏi hậu quả nếu truyền nhầm nhóm máu.' },
+      { r: 'A', en: 'That can be very dangerous, or even fatal.', vi: 'Điều đó có thể rất nguy hiểm, thậm chí gây tử vong.', kw: ['dangerous', 'fatal'], task: 'Cảnh báo hậu quả nguy hiểm, có thể tử vong.' },
+      { r: 'B', en: 'You must be careful about labeling the blood.', vi: 'Các cô hẳn phải cẩn thận lắm trong việc dán nhãn máu.', kw: ['careful', 'labeling'], task: 'Nhắc nhở y tá phải dán nhãn máu cẩn thận.' },
+      { r: 'A', en: "That's right. We keep careful records so no one gets the wrong blood type.", vi: 'Đúng vậy. Chúng tôi lưu hồ sơ rất kỹ để không ai bị truyền nhầm nhóm máu.', kw: ['records', 'wrong'], task: 'Khẳng định lưu hồ sơ kỹ để không nhầm lẫn.' }
+    ]
+  },
+  {
+    id: 'b1u2', code: 'B1 · U2', title: 'Bones (Đọc phim X-quang gãy xương)', cat: 'STAFF',
+    place: 'Phòng đọc phim X-quang khoa chấn thương',
+    roleA: 'Bác sĩ — Gợi mở, kiểm tra kiến thức lâm sàng',
+    roleB: 'Sinh viên Y — Quan sát phim, phản biện & chốt nắn xương',
+    kw3: ['right tibia', 'stress vs displaced', 'realign (nắn xương)'],
+    radar: ['Bước 1: Yêu cầu đọc vị trí & phân loại vết gãy trên X-quang.', 'Bước 2: Gợi ý nhìn kỹ điểm xương hơi di lệch (không phải gãy hở).', 'Bước 3: Chốt phương án nắn chỉnh lại xương (realign).'],
+    a1: ['tibia → lower leg bone', 'compound fracture → bone sticking out of skin', 'realign → put the bone back in place'],
+    lines: [
+      { r: 'A', en: 'What do you see in this X-ray?', vi: 'Em thấy gì trên phim X-quang này?', kw: ['see', 'X-ray'], task: 'Hỏi sinh viên thấy gì trên phim X-quang.' },
+      { r: 'B', en: 'There appears to be a fracture of the right tibia.', vi: 'Có vẻ như có một vết gãy ở xương chày phải ạ.', kw: ['fracture', 'tibia'], task: 'Nêu vết gãy ở xương chày phải (right tibia).' },
+      { r: 'A', en: "That's right. Can you identify the type of fracture?", vi: 'Đúng rồi. Em xác định được loại gãy xương không?', kw: ['type', 'fracture'], task: 'Yêu cầu xác định loại gãy xương.' },
+      { r: 'B', en: 'That looks like a standard stress fracture.', vi: 'Trông giống một vết gãy xương do mỏi thông thường ạ.', kw: ['stress fracture'], task: 'Đoán là gãy xương do mỏi (stress fracture).' },
+      { r: 'A', en: 'Are you sure? Maybe you should take a closer look.', vi: 'Em chắc chứ? Có lẽ em nên nhìn kỹ hơn.', kw: ['closer look'], task: 'Gợi ý sinh viên nhìn kỹ lại phim.' },
+      { r: 'B', en: "Is that wrong? It's not compound. The bone isn't sticking out of the skin.", vi: 'Sai rồi ạ? Đây không phải gãy hở. Xương không đâm xuyên qua da.', kw: ['compound', 'skin'], task: 'Biện luận đây không phải gãy hở.' },
+      { r: 'A', en: "You're right, it's not compound. But can you see how the bone is slightly displaced?", vi: 'Em nói đúng, không phải gãy hở. Nhưng em có thấy xương hơi bị di lệch không?', kw: ['displaced'], task: 'Chỉ ra xương hơi bị di lệch (displaced).' },
+      { r: 'B', en: "Oh, yes, I see that now. So we'll need to realign the bone so that the two parts connect in the right place.", vi: 'Ồ vâng, giờ em thấy rồi. Vậy ta cần nắn chỉnh lại xương để hai đầu xương nối đúng vị trí.', kw: ['realign', 'bone'], task: 'Chốt phương án nắn chỉnh lại xương (realign).' }
+    ]
+  },
+  {
+    id: 'b1u3', code: 'B1 · U3', title: 'Hospital equipment (Kiểm kê vật tư)', cat: 'STAFF',
+    place: 'Kho vật tư y tế / Trạm điều dưỡng cuối ca',
+    roleA: 'Y tá kiểm tra — Rà soát vật tư, đặt hàng & nhắc đổ rác',
+    roleB: 'Y tá thực hiện — Báo cáo bô vệ sinh & gạc y tế',
+    kw3: ['bedpans (phòng 2 & 5)', 'gauze (gạc y tế)', 'biohazard waste'],
+    radar: ['Bước 1: Hỏi kiểm tra vật tư cuối ngày & vật dụng cần thay.', 'Bước 2: Hỏi đồ sắp hết để đặt thêm (gạc y tế).', 'Bước 3: Nhắc đổ thùng rác thải nguy hại sinh học trước khi về.'],
+    a1: ['bedpans → toilet pans for bed patients', 'gauze → wound dressing / bandage', 'biohazard waste → dangerous medical trash'],
+    lines: [
+      { r: 'A', en: 'Have you done your supply checks for the day?', vi: 'Cậu đã kiểm tra vật tư trong ngày chưa?', kw: ['supply checks'], task: 'Hỏi đã kiểm tra vật tư trong ngày chưa.' },
+      { r: 'B', en: 'Yes, I just finished them up.', vi: 'Rồi, mình vừa làm xong.', kw: ['finished'], task: 'Xác nhận vừa kiểm tra xong.' },
+      { r: 'A', en: 'Anything else?', vi: 'Còn gì nữa không?', kw: ['anything'], task: 'Hỏi còn vấn đề gì khác không.' },
+      { r: 'B', en: 'Yes, we need to replace the bedpans in patient rooms 2 and 5.', vi: 'Có, chúng ta cần thay bô vệ sinh ở phòng bệnh số 2 và số 5.', kw: ['bedpans', '2', '5'], task: 'Báo cần thay bô vệ sinh phòng 2 và 5.' },
+      { r: 'A', en: 'Okay. Are we short on anything?', vi: 'Được rồi. Chúng ta có bị thiếu thứ gì không?', kw: ['short'], task: 'Hỏi có bị thiếu vật tư gì không.' },
+      { r: 'B', en: "We're almost out of gauze.", vi: 'Chúng ta sắp hết gạc y tế rồi.', kw: ['gauze'], task: 'Báo sắp hết gạc y tế (gauze).' },
+      { r: 'A', en: "Okay, I'll have to order some more. That reminds me, don't forget to empty the biohazard waste containers before you leave.", vi: 'Được, mình sẽ phải đặt thêm ít nữa. Nhắc mới nhớ, đừng quên đổ thùng rác thải nguy hại sinh học trước khi về nhé.', kw: ['order', 'biohazard'], task: 'Chốt đặt thêm hàng và nhắc đổ thùng rác nguy hại sinh học.' },
+      { r: 'B', en: 'Will do. See you tomorrow.', vi: 'Mình sẽ làm. Hẹn gặp lại ngày mai.', kw: ['will do'], task: 'Đồng ý thực hiện và chào tạm biệt.' }
+    ]
+  },
+  {
+    id: 'b1u4', code: 'B1 · U4', title: 'Parts of the body 1 (Chấn thương cổ chân)', cat: 'CLINIC',
+    place: 'Phòng khám chấn thương chỉnh hình / Cấp cứu',
+    roleA: 'Bác sĩ — Hỏi vị trí đau, nguyên nhân & chỉ định X-quang',
+    roleB: 'Bệnh nhân (Lisa) — Đau mắt cá chân do chạy bị ngã',
+    kw3: ['ankle (mắt cá)', 'running & fell', 'sprain & X-rays'],
+    radar: ['Bước 1: Hỏi vấn đề chung & vị trí đau chính xác (mắt cá chân).', 'Bước 2: Hỏi nguyên nhân tai nạn (đang chạy bị ngã, trẹo chân).', 'Bước 3: Chẩn đoán sơ bộ bong gân & chỉ định chụp X-quang.'],
+    a1: ['ankle → joint above the foot', 'twisted → turned the wrong way', 'sprain → stretched ligaments / minor injury'],
+    lines: [
+      { r: 'A', en: 'What seems to be the problem, Lisa?', vi: 'Có vấn đề gì vậy Lisa?', kw: ['problem'], task: 'Hỏi tổng quát bệnh nhân gặp vấn đề gì.' },
+      { r: 'B', en: 'My leg really hurts.', vi: 'Chân tôi đau lắm.', kw: ['leg', 'hurts'], task: 'Than đau chân.' },
+      { r: 'A', en: 'I see. Where exactly does it hurt?', vi: 'Tôi hiểu. Chính xác là đau ở chỗ nào?', kw: ['where', 'hurt'], task: 'Hỏi chính xác vị trí đau.' },
+      { r: 'B', en: 'Mainly around my ankle.', vi: 'Chủ yếu là quanh mắt cá chân.', kw: ['ankle'], task: 'Chỉ vị trí quanh mắt cá chân (ankle).' },
+      { r: 'A', en: 'Okay. Do you know what happened to make it hurt?', vi: 'Được rồi. Cô có biết chuyện gì xảy ra khiến nó bị đau không?', kw: ['happened'], task: 'Hỏi nguyên nhân gây đau.' },
+      { r: 'B', en: 'I was running and fell down. My foot twisted.', vi: 'Tôi đang chạy thì bị ngã. Bàn chân tôi bị trẹo.', kw: ['running', 'fell'], task: 'Kể đang chạy thì ngã và trẹo chân.' },
+      { r: 'A', en: "Yeah, that's likely the problem. Does it hurt anywhere else?", vi: 'Ừ, khả năng cao là do vậy. Có đau ở chỗ nào khác nữa không?', kw: ['anywhere else'], task: 'Hỏi xem còn đau chỗ nào khác không.' },
+      { r: 'B', en: 'No, just my leg.', vi: 'Không, chỉ ở chân thôi.', kw: ['leg'], task: 'Xác nhận chỉ đau ở chân.' },
+      { r: 'A', en: "Okay. I think it's just an ankle sprain, but we'll take some X-rays to make sure.", vi: 'Được rồi. Tôi nghĩ chỉ là bong gân mắt cá chân thôi, nhưng chúng ta sẽ chụp X-quang để chắc chắn.', kw: ['sprain', 'X-rays'], task: 'Nhận định bong gân và cho chụp X-quang.' }
+    ]
+  },
+  {
+    id: 'b1u5', code: 'B1 · U5', title: 'Parts of the body 2 (Khám đau vùng ngực)', cat: 'CLINIC',
+    place: 'Phòng khám nội khoa',
+    roleA: 'Bác sĩ — Khu trú vùng ngực, hỏi lan cổ & cử động tay',
+    roleB: 'Bệnh nhân (Joe) — Đau trên xương sườn, đau cả sáng ngủ dậy',
+    kw3: ['chest / rib cage', 'no neck pain', 'morning & arms'],
+    radar: ['Bước 1: Chào Joe, hỏi lý do khám & vị trí đau chính xác (trên khung sườn).', 'Bước 2: Hỏi đau có lan lên cổ không và có chỉ đau khi cử động tay không.', 'Bước 3: Chốt khám trực tiếp để tìm nguyên nhân.'],
+    a1: ['rib cage → chest bones', 'what brings you in → why did you come here today'],
+    lines: [
+      { r: 'A', en: 'Hi, Joe. What brings you in today?', vi: 'Chào Joe. Hôm nay có chuyện gì đưa anh tới khám vậy?', kw: ['brings you'], task: 'Chào Joe và hỏi lý do đi khám.' },
+      { r: 'B', en: 'My chest hurts.', vi: 'Ngực tôi bị đau.', kw: ['chest', 'hurts'], task: 'Báo bị đau ngực.' },
+      { r: 'A', en: 'All right. Where does it hurt exactly?', vi: 'Được rồi. Chính xác là đau ở vị trí nào?', kw: ['where', 'hurt'], task: 'Hỏi vị trí đau chính xác.' },
+      { r: 'B', en: "It's just above my rib cage.", vi: 'Ngay phía trên khung xương sườn của tôi.', kw: ['rib cage'], task: 'Chỉ ngay trên khung xương sườn (rib cage).' },
+      { r: 'A', en: 'Any pain near the neck?', vi: 'Có đau gần vùng cổ không?', kw: ['neck'], task: 'Hỏi có đau gần cổ không.' },
+      { r: 'B', en: "No, that part doesn't hurt.", vi: 'Không, phần đó không đau.', kw: ['no', 'hurt'], task: 'Phủ nhận đau vùng cổ.' },
+      { r: 'A', en: 'I see. Does it only hurt when you move your arms?', vi: 'Tôi hiểu. Có phải nó chỉ đau khi anh cử động cánh tay không?', kw: ['move', 'arms'], task: 'Hỏi có phải chỉ đau khi cử động tay không.' },
+      { r: 'B', en: 'No, it hurts when I wake up in the morning too.', vi: 'Không, sáng ngủ dậy nó cũng đau nữa.', kw: ['morning'], task: 'Bổ sung sáng ngủ dậy cũng đau.' },
+      { r: 'A', en: "Okay, I'll take a look and see what I can find.", vi: 'Được rồi, để tôi khám xem tìm ra nguyên nhân gì không.', kw: ['take a look'], task: 'Chốt vào khám trực tiếp.' }
+    ]
+  },
+  {
+    id: 'b1u6', code: 'B1 · U6', title: 'Parts of the body 3 (Chấn thương vùng mặt)', cat: 'STAFF',
+    place: 'Khu tiếp nhận cấp cứu',
+    roleA: 'Y tá — Báo cáo vết trầy trên mắt, má & sưng môi',
+    roleB: 'Bác sĩ — Hỏi tọa độ vết thương & vào khám',
+    kw3: ['scrapes on face', 'left eye & cheek', 'swollen lip'],
+    radar: ['Bước 1: Báo đã xem bệnh nhân phòng 10 có nhiều vết trầy xước trên mặt.', 'Bước 2: Nêu tọa độ: 2 vết trên mắt trái, 1 vết sâu ở má trái gần mũi.', 'Bước 3: Bổ sung môi hơi sưng để bác sĩ vào khám.'],
+    a1: ['scrapes → skin scratches', 'cheek → side of the face', 'swollen lip → puffy mouth'],
+    lines: [
+      { r: 'A', en: 'I saw the patient in room ten.', vi: 'Tôi vừa xem qua bệnh nhân ở phòng số 10.', kw: ['patient', 'ten'], task: 'Báo vừa xem bệnh nhân phòng 10.' },
+      { r: 'B', en: 'How is she doing?', vi: 'Cô ấy thế nào rồi?', kw: ['how'], task: 'Hỏi tình trạng bệnh nhân.' },
+      { r: 'A', en: 'She has several scrapes on her face. Some look serious.', vi: 'Cô ấy có vài vết trầy xước trên mặt. Một số vết trông khá nghiêm trọng.', kw: ['scrapes', 'face'], task: 'Mô tả có nhiều vết trầy trên mặt.' },
+      { r: 'B', en: 'Where exactly are the scrapes?', vi: 'Chính xác các vết trầy nằm ở đâu?', kw: ['where', 'scrapes'], task: 'Hỏi vị trí chính xác vết trầy.' },
+      { r: 'A', en: 'Two above the left eye. And a deep one on the left cheek, near the nose.', vi: 'Hai vết ở trên mắt trái. Và một vết sâu ở má trái, gần mũi.', kw: ['left eye', 'cheek'], task: 'Nêu 2 vết trên mắt trái và 1 vết sâu ở má trái gần mũi.' },
+      { r: 'B', en: 'Is that all?', vi: 'Chỉ có vậy thôi à?', kw: ['all'], task: 'Hỏi còn tổn thương nào khác không.' },
+      { r: 'A', en: 'No, her lip is a bit swollen.', vi: 'Chưa, môi cô ấy cũng hơi bị sưng nữa.', kw: ['lip', 'swollen'], task: 'Bổ sung môi hơi sưng (swollen lip).' },
+      { r: 'B', en: "Okay, I'll take a look.", vi: 'Được rồi, để tôi vào xem.', kw: ['take a look'], task: 'Chốt vào trực tiếp thăm khám.' }
+    ]
+  },
+  {
+    id: 'b1u7', code: 'B1 · U7', title: 'Respiratory system (Thông báo hen suyễn)', cat: 'CLINIC',
+    place: 'Phòng tư vấn hô hấp, đã có kết quả xét nghiệm',
+    roleA: 'Bác sĩ — Thông báo hen suyễn, kê đơn & hướng dẫn dùng ống hít',
+    roleB: 'Bệnh nhân (Sally) — Lo lắng hỏi cách điều trị & dạng thuốc',
+    kw3: ['asthma (hen suyễn)', 'prescription (đơn thuốc)', 'inhale (dạng hít)'],
+    radar: ['Bước 1: Báo kết quả xét nghiệm & chẩn đoán mắc hen suyễn (asthma).', 'Bước 2: Trấn an bệnh kiểm soát được bằng đơn thuốc.', 'Bước 3: Đính chính dùng dạng hít (inhale), không uống thuốc viên.'],
+    a1: ['asthma → breathing problem', 'prescription → medicine order from doctor', 'inhale → breathe the medicine in'],
+    lines: [
+      { r: 'A', en: "Good morning Sally. I've received the test results.", vi: 'Chào buổi sáng Sally. Tôi đã nhận được kết quả xét nghiệm rồi.', kw: ['test results'], task: 'Chào Sally và báo đã có kết quả xét nghiệm.' },
+      { r: 'B', en: 'What did you find doctor?', vi: 'Bác sĩ tìm thấy gì vậy ạ?', kw: ['find'], task: 'Hỏi bác sĩ tìm thấy gì.' },
+      { r: 'A', en: "I'm sorry to tell you, you have asthma.", vi: 'Tôi rất tiếc phải báo với cô là cô bị bệnh hen suyễn.', kw: ['asthma'], task: 'Thông báo chẩn đoán bệnh hen suyễn (asthma).' },
+      { r: 'B', en: 'Oh, dear. Can it be treated?', vi: 'Ôi trời. Bệnh này có điều trị được không ạ?', kw: ['treated'], task: 'Hỏi bệnh có điều trị được không.' },
+      { r: 'A', en: 'Yes. For one, I can give you a prescription for some medicine.', vi: 'Được chứ. Đầu tiên, tôi có thể kê đơn thuốc cho cô.', kw: ['prescription'], task: 'Giải thích có thể kê đơn thuốc điều trị.' },
+      { r: 'B', en: "So I'll take pills?", vi: 'Vậy là tôi sẽ uống thuốc viên ạ?', kw: ['pills'], task: 'Hỏi xem có phải uống thuốc viên không.' },
+      { r: 'A', en: "Actually, no. You'll inhale it.", vi: 'Thực ra là không. Cô sẽ dùng dạng hít.', kw: ['inhale'], task: 'Đính chính thuốc dùng dạng hít (inhale).' }
+    ]
+  },
+  {
+    id: 'b1u8', code: 'B1 · U8', title: 'Circulatory system (Cảnh báo suy tim)', cat: 'CLINIC',
+    place: 'Phòng khám tim mạch, tư vấn bệnh nhân hút thuốc',
+    roleA: 'Bác sĩ — Giải thích suy tim & dặn dấu hiệu cấp cứu',
+    roleB: 'Bệnh nhân — Hỏi rõ cơ chế, triệu chứng & cam kết làm theo',
+    kw3: ['heart failure', 'blood flow', 'leg swells / breathing'],
+    radar: ['Bước 1: Cảnh báo hút thuốc tăng nguy cơ suy tim (heart failure).', 'Bước 2: Giải thích tim không bơm đủ máu & nguy cơ tàn tật/tử vong.', 'Bước 3: Dặn gọi viện ngay nếu sưng chân hoặc khó thở.'],
+    a1: ['heart failure → weak heart', 'blood flow → blood moving around the body', 'trouble breathing → hard to breathe'],
+    lines: [
+      { r: 'A', en: 'Your smoking habit puts you at increased risk for heart failure.', vi: 'Thói quen hút thuốc khiến anh có nguy cơ cao bị suy tim.', kw: ['smoking', 'heart failure'], task: 'Cảnh báo hút thuốc tăng nguy cơ suy tim.' },
+      { r: 'B', en: 'Could you explain what that means, exactly?', vi: 'Bác sĩ giải thích chính xác điều đó nghĩa là gì được không?', kw: ['explain'], task: 'Yêu cầu giải thích rõ suy tim là gì.' },
+      { r: 'A', en: "Certainly. It's often caused by a heart attack. Basically, it just means the heart cannot supply enough blood flow to meet the body's needs.", vi: 'Chắc chắn rồi. Bệnh thường do đau tim gây ra. Về cơ bản, tim không thể cung cấp đủ lưu lượng máu đáp ứng nhu cầu cơ thể.', kw: ['blood flow'], task: 'Giải thích tim không cung cấp đủ lưu lượng máu.' },
+      { r: 'B', en: "That doesn't sound good.", vi: 'Nghe không ổn chút nào.', kw: ['good'], task: 'Bày tỏ lo ngại.' },
+      { r: 'A', en: "No, it's not. It is a serious condition that could lead to long-term disability or death.", vi: 'Đúng là không ổn. Đây là tình trạng nghiêm trọng có thể dẫn đến tàn tật lâu dài hoặc tử vong.', kw: ['disability', 'death'], task: 'Nhấn mạnh có thể gây tàn tật lâu dài hoặc tử vong.' },
+      { r: 'B', en: 'Oh my. What are the symptoms?', vi: 'Ôi trời. Triệu chứng là gì vậy ạ?', kw: ['symptoms'], task: 'Hỏi triệu chứng cụ thể.' },
+      { r: 'A', en: 'Call the hospital immediately if your leg swells or if you have trouble breathing.', vi: 'Hãy gọi bệnh viện ngay lập tức nếu chân anh bị sưng phù hoặc nếu anh thấy khó thở.', kw: ['leg swells', 'breathing'], task: 'Dặn gọi bệnh viện ngay nếu sưng chân hoặc khó thở.' },
+      { r: 'B', en: 'I will. Thank you, Doctor.', vi: 'Tôi sẽ làm vậy. Cảm ơn bác sĩ.', kw: ['thank you'], task: 'Cam kết làm theo lời dặn và cảm ơn.' }
+    ]
+  },
+  {
+    id: 'b1u9', code: 'B1 · U9', title: 'Digestive system (Tư vấn nội soi đại tràng)', cat: 'CLINIC',
+    place: 'Phòng khám tiêu hóa',
+    roleA: 'Bác sĩ — Đề xuất nội soi đại tràng & mô tả quy trình camera',
+    roleB: 'Bệnh nhân (Mr. Harris) — Đau bụng 1 tuần, hỏi quy trình & đồng ý',
+    kw3: ['stomach pain (1 tuần)', 'colonoscopy', 'fiber-optic camera'],
+    radar: ['Bước 1: Hỏi thăm cơn đau bụng kéo dài & đề xuất nội soi đại tràng.', 'Bước 2: Khẳng định cần thiết để kiểm tra vấn đề.', 'Bước 3: Mô tả đưa camera sợi quang qua trực tràng và quan sát khi rút ra.'],
+    a1: ['colonoscopy → test with a small camera inside the bowel', 'withdrawn → pulled back out'],
+    lines: [
+      { r: 'A', en: "Hello Mr. Harris. You're still having the stomach pain?", vi: 'Chào anh Harris. Anh vẫn còn bị đau bụng à?', kw: ['stomach pain'], task: 'Hỏi thăm cơn đau bụng kéo dài.' },
+      { r: 'B', en: "Yeah. I've had it for about a week.", vi: 'Vâng. Tôi bị đau khoảng một tuần nay rồi.', kw: ['week'], task: 'Xác nhận đau bụng khoảng 1 tuần.' },
+      { r: 'A', en: "All right. We're probably going to have to do a colonoscopy.", vi: 'Được rồi. Có lẽ chúng ta sẽ phải tiến hành nội soi đại tràng.', kw: ['colonoscopy'], task: 'Đề xuất làm nội soi đại tràng (colonoscopy).' },
+      { r: 'B', en: "Really? Do you think that's necessary?", vi: 'Thật sao? Bác sĩ nghĩ điều đó cần thiết à?', kw: ['necessary'], task: 'Hỏi xem có thực sự cần thiết không.' },
+      { r: 'A', en: 'Yes. We should check for any problems.', vi: 'Đúng vậy. Chúng ta nên kiểm tra xem có vấn đề gì không.', kw: ['check', 'problems'], task: 'Khẳng định cần thiết để kiểm tra vấn đề.' },
+      { r: 'B', en: 'Okay. What does it involve?', vi: 'Vâng. Thủ thuật đó gồm những gì vậy ạ?', kw: ['involve'], task: 'Hỏi thủ thuật diễn ra thế nào.' },
+      { r: 'A', en: "We'll insert a fiber-optic camera into the rectum. While the camera is being withdrawn, we'll find the problem.", vi: 'Chúng tôi sẽ đưa một camera sợi quang vào trực tràng. Trong lúc rút camera ra, chúng tôi sẽ tìm ra vấn đề.', kw: ['camera', 'rectum'], task: 'Mô tả đưa camera sợi quang vào trực tràng và quan sát khi rút ra.' },
+      { r: 'B', en: 'All right. Better safe than sorry I guess.', vi: 'Được rồi. Tôi đoán cẩn tắc vô áy náy vậy.', kw: ['safe'], task: 'Đồng ý thực hiện thủ thuật.' }
+    ]
+  },
+  {
+    id: 'b1u12', code: 'B1 · U12', title: 'Nursing (Phỏng vấn tuyển dụng Điều dưỡng)', cat: 'STAFF',
+    place: 'Phòng nhân sự bệnh viện (vị trí LPN)',
+    roleA: 'Người PV — Hỏi kinh nghiệm, động lực & hồ sơ điện tử',
+    roleB: 'Điều dưỡng — Nêu 3 năm kinh nghiệm, thích môi trường nhanh',
+    kw3: ['3 years experience', 'clean wounds & monitor', 'electronic records'],
+    radar: ['Bước 1: Giới thiệu vị trí LPN & hỏi kinh nghiệm làm việc.', 'Bước 2: Hỏi lý do chọn nghề & mức độ phù hợp với công việc bận rộn.', 'Bước 3: Hỏi kỹ năng sử dụng hồ sơ bệnh án điện tử.'],
+    a1: ['fast-paced → very busy and quick', 'electronic patient records → computer medical files'],
+    lines: [
+      { r: 'A', en: "Hello, I'll be interviewing you for the LPN position.", vi: 'Chào bạn, tôi sẽ phỏng vấn bạn cho vị trí Điều dưỡng thực hành được cấp phép - LPN.', kw: ['LPN'], task: 'Chào và giới thiệu phỏng vấn vị trí LPN.' },
+      { r: 'B', en: 'Nice to meet you.', vi: 'Rất vui được gặp anh/chị.', kw: ['meet'], task: 'Chào đáp lễ.' },
+      { r: 'A', en: 'So what kind of experience do you have?', vi: 'Vậy bạn có kinh nghiệm làm việc như thế nào?', kw: ['experience'], task: 'Hỏi kinh nghiệm làm việc.' },
+      { r: 'B', en: 'Well, I have worked at Jackson Hospital for the past three years.', vi: 'À, tôi đã làm việc tại Bệnh viện Jackson trong ba năm qua.', kw: ['three years'], task: 'Nêu kinh nghiệm 3 năm tại BV Jackson.' },
+      { r: 'A', en: 'And why did you go into nursing?', vi: 'Và tại sao bạn lại chọn ngành điều dưỡng?', kw: ['nursing'], task: 'Hỏi lý do chọn ngành điều dưỡng.' },
+      { r: 'B', en: 'I love taking care of people.', vi: 'Tôi thích chăm sóc mọi người.', kw: ['taking care'], task: 'Bày tỏ yêu thích chăm sóc mọi người.' },
+      { r: 'A', en: "Excellent. Now, this is a busy hospital. You'll be cleaning lots of wounds and monitoring several patients' conditions. Is that appealing to you?", vi: 'Tuyệt vời. Ở đây là bệnh viện rất bận rộn. Bạn sẽ rửa nhiều vết thương và theo dõi nhiều bệnh nhân. Điều đó có hấp dẫn bạn không?', kw: ['wounds', 'monitoring'], task: 'Mô tả việc rửa vết thương, theo dõi bệnh nhân và hỏi sự hứng thú.' },
+      { r: 'B', en: 'Yes, I like a fast-paced environment.', vi: 'Có, tôi thích môi trường làm việc nhịp độ nhanh.', kw: ['fast-paced'], task: 'Khẳng định thích môi trường nhịp độ nhanh.' },
+      { r: 'A', en: "Right, it's definitely fast here. But we still have to treat each case carefully. Now, have you worked with electronic patient records?", vi: 'Đúng, ở đây chắc chắn là nhanh. Nhưng vẫn phải cẩn thận từng ca. Bạn đã dùng hồ sơ bệnh án điện tử chưa?', kw: ['carefully', 'electronic'], task: 'Nhấn mạnh sự cẩn thận và hỏi về hồ sơ điện tử.' },
+      { r: 'B', en: 'Yes, I have used them at Jackson Hospital.', vi: 'Rồi ạ, tôi đã sử dụng chúng ở Bệnh viện Jackson.', kw: ['used', 'Jackson'], task: 'Xác nhận đã dùng hồ sơ điện tử.' }
+    ]
+  },
+  {
+    id: 'b1u15', code: 'B1 · U15', title: 'Surgery (Điều chỉnh lịch phẫu thuật)', cat: 'STAFF',
+    place: 'Văn phòng khoa ngoại / Phòng hành chính phẫu thuật',
+    roleA: 'Bác sĩ — Bác bỏ giờ 10:30 vì ca ghép thận & dời lịch',
+    roleB: 'Thư ký — Nhắc lịch mổ ruột thừa & đề xuất khung 3:00',
+    kw3: ['appendectomy (10:30)', 'kidney transplant', 'slot at 3:00'],
+    radar: ['Bước 1: Nghe thư ký nhắc lịch mổ ruột thừa lúc 10:30 và bác bỏ.', 'Bước 2: Giải thích vướng ca ghép thận dài và phức tạp.', 'Bước 3: Đề xuất dời ca mổ ruột thừa sang muộn hơn (3:00 chiều).'],
+    a1: ['appendectomy → surgery to remove the appendix', 'push back → move to a later time'],
+    lines: [
+      { r: 'B', en: 'You have an appendectomy on Ms. Patel at 10:30.', vi: 'Bác sĩ có ca mổ ruột thừa cho cô Patel lúc 10:30 ạ.', kw: ['appendectomy', '10:30'], task: 'Nhắc lịch mổ ruột thừa cho cô Patel lúc 10:30.' },
+      { r: 'A', en: "That won't work. Mr. Jenkins' kidney transplant is going to be a very long and complex operation.", vi: 'Không ổn rồi. Ca ghép thận của ông Jenkins sẽ là một ca phẫu thuật rất dài và phức tạp.', kw: ['kidney transplant', 'complex'], task: 'Bác bỏ giờ 10:30 vì ca ghép thận dài và phức tạp.' },
+      { r: 'B', en: 'What should I do, Doctor?', vi: 'Tôi nên làm gì bây giờ ạ, thưa bác sĩ?', kw: ['should I do'], task: 'Hỏi ý kiến chỉ đạo của bác sĩ.' },
+      { r: 'A', en: 'We may need to push back the appendectomy to later in the day.', vi: 'Chúng ta có lẽ cần dời ca mổ ruột thừa sang muộn hơn trong ngày.', kw: ['push back', 'appendectomy'], task: 'Đề xuất dời ca mổ ruột thừa sang muộn hơn trong ngày.' },
+      { r: 'B', en: "Okay. There's a slot open at 3:00.", vi: 'Vâng. Có một khung giờ trống lúc 3:00 chiều ạ.', kw: ['3:00'], task: 'Đề xuất khung giờ trống lúc 3:00 chiều.' }
+    ]
+  },
+  {
+    id: 'b2u1', code: 'B2 · U1', title: 'Hospital departments (Chỉ đường trong BV)', cat: 'CLINIC',
+    place: 'Kết thúc buổi khám tại phòng khám đa khoa',
+    roleA: 'Bác sĩ — Chỉ đường qua Chẩn đoán hình ảnh & Nhà thuốc',
+    roleB: 'Bệnh nhân — Hỏi khoa chụp X-quang & xác nhận vị trí nhà thuốc',
+    kw3: ['radiology (tầng 4)', 'turn left / dermatology', 'pharmacy (tầng 2)'],
+    radar: ['Bước 1: Trấn an sức khỏe tốt trừ cổ tay & bảo qua khoa Chẩn đoán hình ảnh chụp X-quang.', 'Bước 2: Chỉ đường tầng 4, rẽ trái sau khoa Da liễu.', 'Bước 3: Dặn ghé Nhà thuốc tầng 2 (cạnh khoa Ngoại) lấy thuốc trước.'],
+    a1: ['radiology → X-ray department', 'dermatology → skin department', 'pharmacy → place to get medicine'],
+    lines: [
+      { r: 'A', en: "Other than your wrist, you're in good health.", vi: 'Ngoài cổ tay ra thì sức khỏe của anh rất tốt.', kw: ['wrist', 'good health'], task: 'Trấn an sức khỏe tốt trừ cổ tay.' },
+      { r: 'B', en: 'Okay, Doctor. Where should I go next?', vi: 'Vâng, thưa bác sĩ. Tiếp theo tôi nên đi đâu ạ?', kw: ['where', 'next'], task: 'Hỏi tiếp theo nên đi đâu.' },
+      { r: 'A', en: 'I want you to go to radiology for some X-rays.', vi: 'Tôi muốn anh qua khoa chẩn đoán hình ảnh để chụp X-quang.', kw: ['radiology', 'X-rays'], task: 'Bảo qua khoa Chẩn đoán hình ảnh chụp X-quang.' },
+      { r: 'B', en: "Where's that department?", vi: 'Khoa đó nằm ở đâu vậy ạ?', kw: ['where'], task: 'Hỏi vị trí khoa đó.' },
+      { r: 'A', en: "It's on the fourth floor. Turn left after the dermatology department.", vi: 'Nó ở trên tầng bốn. Rẽ trái sau khi qua khoa da liễu.', kw: ['fourth floor', 'left'], task: 'Chỉ đường lên tầng 4, rẽ trái sau khoa da liễu.' },
+      { r: 'B', en: "I'll go there right away.", vi: 'Tôi sẽ qua đó ngay.', kw: ['right away'], task: 'Xác nhận sẽ qua đó ngay.' },
+      { r: 'A', en: 'But first, you should stop by the pharmacy. Your prescription will be ready soon.', vi: 'Nhưng trước tiên, anh nên ghé qua nhà thuốc. Đơn thuốc của anh sẽ xong sớm thôi.', kw: ['pharmacy', 'prescription'], task: 'Dặn ghé nhà thuốc lấy đơn thuốc trước.' },
+      { r: 'B', en: "That's on the second floor, right?", vi: 'Chỗ đó ở tầng hai đúng không ạ?', kw: ['second floor'], task: 'Hỏi xác nhận nhà thuốc ở tầng 2.' },
+      { r: 'A', en: 'Yes, next to the surgery department.', vi: 'Đúng rồi, nằm cạnh khoa ngoại/phẫu thuật.', kw: ['surgery'], task: 'Xác nhận nằm cạnh khoa ngoại.' }
+    ]
+  },
+  {
+    id: 'b2u2', code: 'B2 · U2', title: 'Hospital staff (Hội chẩn sai sót X-quang)', cat: 'STAFF',
+    place: 'Bàn làm việc của bác sĩ và điều dưỡng tại khoa',
+    roleA: 'Y tá — Đưa phim X-quang, nêu tên Dr. Locke & đặt lịch khám lại',
+    roleB: 'Bác sĩ — Chẩn đoán gãy xương sườn & yêu cầu khám lại',
+    kw3: ['X-ray / broken rib', 'radiologist Dr. Locke', 'set up appointment'],
+    radar: ['Bước 1: Nhờ bác sĩ xem lại phim X-quang.', 'Bước 2: Đồng tình nghi gãy xương sườn & tra tên bác sĩ X-quang (Dr. Locke).', 'Bước 3: Chủ động báo văn phòng Dr. Locke đặt lịch khám lại.'],
+    a1: ['broken rib → cracked chest bone', 'radiologist → X-ray doctor', 'set up an appointment → book a visit'],
+    lines: [
+      { r: 'A', en: 'Could you come here for a second?', vi: 'Bác sĩ lại đây một lát được không ạ?', kw: ['come here'], task: 'Nhờ bác sĩ lại xem giúp.' },
+      { r: 'B', en: 'Sure, what do you need?', vi: 'Được chứ, cô cần gì vậy?', kw: ['need'], task: 'Sẵn sàng hỗ trợ.' },
+      { r: 'A', en: 'Take a look at this X-ray.', vi: 'Bác sĩ xem phim X-quang này đi ạ.', kw: ['X-ray'], task: 'Đưa phim X-quang cho bác sĩ xem.' },
+      { r: 'B', en: 'Hmm... that looks like a broken rib.', vi: 'Ừm... trông giống một cái xương sườn bị gãy.', kw: ['broken rib'], task: 'Đọc phim và nhận định gãy xương sườn.' },
+      { r: 'A', en: "Yes, that's what I thought.", vi: 'Vâng, tôi cũng nghĩ vậy.', kw: ['thought'], task: 'Đồng tình nhận định gãy xương sườn.' },
+      { r: 'B', en: "Who's the radiologist?", vi: 'Ai là bác sĩ chẩn đoán hình ảnh ca này?', kw: ['radiologist'], task: 'Hỏi ai là bác sĩ X-quang ca này.' },
+      { r: 'A', en: 'Dr. Locke, it says here.', vi: 'Trên đây ghi là bác sĩ Locke ạ.', kw: ['Locke'], task: 'Báo tên bác sĩ X-quang là Dr. Locke.' },
+      { r: 'B', en: 'He should examine the patient. He must have missed this.', vi: 'Ông ấy nên khám lại cho bệnh nhân. Chắc hẳn ông ấy đã bỏ sót chỗ này.', kw: ['examine', 'missed'], task: 'Yêu cầu Dr. Locke khám lại vì đã bỏ sót.' },
+      { r: 'A', en: "I agree. I'll let his office know to set up an appointment.", vi: 'Tôi đồng ý. Tôi sẽ báo cho văn phòng của ông ấy để đặt lịch hẹn.', kw: ['appointment'], task: 'Chủ động báo đặt lịch hẹn khám lại.' },
+      { r: 'B', en: 'Good idea. Thanks for consulting me.', vi: 'Ý hay đấy. Cảm ơn cô đã hỏi ý kiến tôi.', kw: ['thanks'], task: 'Khen ý hay và cảm ơn y tá.' }
+    ]
+  }
+];
+
+let xp = 0, streak = 0, xIdx = 0, xClue = null, xDone = {}, pool = [], qIdx = 0, qAns = false, vFilt = 'ALL', times = [], t0 = Date.now(), autoNext = true, autoRenew = true, autoTimer = null, masteredQs = {}, weakTags = {}, quizHistory = {}, seenQuestions = {}, errTotals = {}, lastWrongAt = {}, reviewFlag = {}, qCounter = 0, winTotal = 0, winOk = 0, winTags = {};
+let spkFilter = 'ALL', spkUnitId = 'b1u1', spkRole = 'A', spkMask = 0, spkPanic = '', phrasebook = {}, selectedHighlightText = '';
+
+const shuf = a => { const c = [...a]; for (let i = c.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [c[i], c[j]] = [c[j], c[i]]; } return c; };
+const qKey = txt => (txt || '').trim().toLowerCase().replace(/\s+/g, ' ');
+const markSeen = txt => { if (txt) seenQuestions[qKey(txt)] = true; };
+const isSeen = txt => !!seenQuestions[qKey(txt)];
+const packQ = (r, idx) => ({ id: r.id || (idx !== undefined ? 'base_' + idx : 'gen_' + Math.random().toString(36).slice(2, 8)), t: r.t, q: r.q, h: r.h, o: shuf(r.o.map((t, i) => ({ t, c: i === r.a }))), e: r.e });
+const finalizePack = p => ({ id: p.id, t: p.t, q: p.q, h: p.h, o: p.o.map(x => x.t), a: p.o.findIndex(x => x.c), e: p.e });
+const makeQ = (r, idx) => finalizePack(packQ(r, idx));
+const avgS = () => times.length ? Number((times.reduce((a, b) => a + b, 0) / times.length).toFixed(1)) : null;
+
+function applyExtra(d) {
+  errTotals = d.errTotals || {}; lastWrongAt = d.lastWrongAt || {}; reviewFlag = d.reviewFlag || {};
+  qCounter = d.qCounter || 0; winTotal = d.winTotal || 0; winOk = d.winOk || 0; winTags = d.winTags || {};
+  phrasebook = (d.phrasebook && typeof d.phrasebook === 'object') ? d.phrasebook : {};
+}
+
+function clearAutoTimer() { if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; } }
+function renderAutoNextBtn() {
+  const btn = document.getElementById('auto-next-btn'); if (!btn) return;
+  btn.textContent = autoNext ? '⚡ Tự động chuyển: Bật' : '⏸️ Tự động chuyển: Tắt';
+  btn.className = autoNext
+    ? 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+    : 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700';
+}
+function toggleAutoNext() { autoNext = !autoNext; if (!autoNext) clearAutoTimer(); renderAutoNextBtn(); save(); }
+
+function renderAutoRenewBtn() {
+  const btn = document.getElementById('auto-renew-btn'); if (!btn) return;
+  btn.textContent = autoRenew ? '🔄 Tự tạo đề mới: Bật' : '⏹️ Tự tạo đề mới: Tắt';
+  btn.className = autoRenew
+    ? 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+    : 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700';
+}
+function toggleAutoRenew() { autoRenew = !autoRenew; renderAutoRenewBtn(); if (qAns && qIdx === pool.length - 1) renderQuiz(); save(); }
+
+function getTier() {
+  const s = avgS(); let cur = TIERS[0];
+  for (let i = 1; i < TIERS.length; i++) { const t = TIERS[i]; if (xp >= t.minXp && (s === null ? xp >= t.minXp * 1.4 : s <= t.maxS)) cur = t; else break; }
+  return cur;
+}
+function renderHud() {
+  document.getElementById('xp-count').textContent = xp;
+  document.getElementById('streak-count').textContent = '🔥 ' + streak;
+  const s = avgS(); document.getElementById('speed-count').textContent = s !== null ? s + 's/câu' : '--s/câu';
+  const tier = getTier(); document.getElementById('rank-badge').textContent = tier.name;
+  const ti = TIERS.findIndex(x => x.name === tier.name);
+  document.getElementById('rank-ladder').innerHTML = TIERS.map((t, i) => `<div class="px-2 py-1.5 rounded-lg border ${t.name === tier.name ? 'bg-blue-50 dark:bg-blue-950/70 border-blue-400 text-blue-800 dark:text-blue-200 font-bold' : i <= ti ? 'bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 text-emerald-700 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200/70 dark:border-slate-800 text-slate-400'}"><div class="truncate">${t.name === tier.name ? '👑 ' : ''}${t.name}</div><div class="text-xs opacity-80">${t.minXp} XP · ${t.maxS === Infinity ? 'Mọi tốc độ' : '≤' + t.maxS + 's'}</div></div>`).join('');
+}
+
+function save() {
+  safeSet(STORAGE_KEY, JSON.stringify({ xp, streak, xIdx, xDone, pool, qIdx, vFilt, autoNext, autoRenew, masteredQs, weakTags, quizHistory, seenQuestions, errTotals, lastWrongAt, reviewFlag, qCounter, winTotal, winOk, winTags, phrasebook, times: times.slice(-40) }));
+}
+window.exportProgressSnapshot = function() {
+  return { xp, streak, xIdx, xDone, pool, qIdx, vFilt, autoNext, autoRenew, masteredQs, weakTags, quizHistory, seenQuestions, errTotals, lastWrongAt, reviewFlag, qCounter, winTotal, winOk, winTags, phrasebook, times: times.slice(-40) };
+};
+window.importProgressSnapshot = function(d) {
+  if (!d || typeof d !== 'object') return;
+  clearAutoTimer();
+  xp = typeof d.xp === 'number' ? d.xp : 0;
+  streak = typeof d.streak === 'number' ? d.streak : 0;
+  xIdx = typeof d.xIdx === 'number' ? d.xIdx : 0;
+  xDone = (d.xDone && typeof d.xDone === 'object') ? d.xDone : {};
+  masteredQs = (d.masteredQs && typeof d.masteredQs === 'object') ? d.masteredQs : {};
+  weakTags = (d.weakTags && typeof d.weakTags === 'object') ? d.weakTags : {};
+  quizHistory = (d.quizHistory && typeof d.quizHistory === 'object') ? d.quizHistory : {};
+  seenQuestions = (d.seenQuestions && typeof d.seenQuestions === 'object') ? d.seenQuestions : {};
+  pool = Array.isArray(d.pool) && d.pool.length ? d.pool : QUIZ.map((r, i) => makeQ(r, i));
+  qIdx = typeof d.qIdx === 'number' ? Math.min(d.qIdx, Math.max(0, pool.length - 1)) : 0;
+  vFilt = typeof d.vFilt === 'string' ? d.vFilt : 'ALL';
+  autoNext = typeof d.autoNext === 'boolean' ? d.autoNext : true;
+  autoRenew = typeof d.autoRenew === 'boolean' ? d.autoRenew : true;
+  times = Array.isArray(d.times) ? d.times : [];
+  applyExtra(d);
+  xClue = null; qAns = false;
+  save(); renderHud(); renderXray(); renderQuiz(); filterVocab(vFilt); renderSpeaking();
+};
+
+function load() {
+  try {
+    const d = JSON.parse(safeGet(STORAGE_KEY) || 'null');
+    if (d) {
+      xp = d.xp || 0; streak = d.streak || 0; xIdx = d.xIdx || 0; xDone = d.xDone || {};
+      masteredQs = d.masteredQs || {}; weakTags = d.weakTags || {}; quizHistory = d.quizHistory || {}; seenQuestions = d.seenQuestions || {};
+      pool = Array.isArray(d.pool) && d.pool.length ? d.pool : QUIZ.map((r, i) => makeQ(r, i));
+      qIdx = typeof d.qIdx === 'number' ? Math.min(d.qIdx, Math.max(0, pool.length - 1)) : 0;
+      vFilt = d.vFilt || 'ALL';
+      autoNext = typeof d.autoNext === 'boolean' ? d.autoNext : true;
+      autoRenew = typeof d.autoRenew === 'boolean' ? d.autoRenew : true;
+      times = Array.isArray(d.times) ? d.times : [];
+      applyExtra(d);
+    } else {
+      pool = QUIZ.map((r, i) => makeQ(r, i));
+    }
+  } catch (e) {
+    pool = QUIZ.map((r, i) => makeQ(r, i));
+  }
+}
+
+let resetConfirmTimer = null;
+function confirmResetProgress(btn) {
+  if (!btn.dataset.armed) {
+    btn.dataset.armed = '1';
+    btn.textContent = '⚠️ Bấm lần nữa để xóa';
+    btn.className = 'text-xs px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold';
+    clearTimeout(resetConfirmTimer);
+    resetConfirmTimer = setTimeout(() => {
+      delete btn.dataset.armed;
+      btn.textContent = 'Xóa lưu';
+      btn.className = 'text-xs px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-600';
+    }, 3500);
+    return;
+  }
+  clearTimeout(resetConfirmTimer);
+  delete btn.dataset.armed;
+  btn.textContent = 'Xóa lưu';
+  btn.className = 'text-xs px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-600';
+  resetSavedProgress();
+}
+
+function resetSavedProgress() {
+  clearAutoTimer(); xp = 0; streak = 0; xIdx = 0; xDone = {}; masteredQs = {}; weakTags = {}; quizHistory = {}; seenQuestions = {};
+  applyExtra({}); pool = QUIZ.map((r, i) => makeQ(r, i)); qIdx = 0; times = [];
+  save(); renderHud(); renderXray(); renderQuiz(); filterVocab(vFilt); renderSpeaking();
+}
+
+function openGuideModal() {
+  const m = document.getElementById('guide-modal');
+  if (m) m.classList.remove('hidden');
+}
+function closeGuideModal() {
+  const m = document.getElementById('guide-modal');
+  if (m) m.classList.add('hidden');
+  safeSet(GUIDE_SEEN_KEY, '1');
+}
+
+function score(pts) {
+  const sec = Math.max(.5, (Date.now() - t0) / 1000);
+  times.push(Number(sec.toFixed(1))); if (times.length > 40) times.shift();
+  xp += pts + (sec <= 2.5 ? 12 : sec <= 4.5 ? 5 : 0);
+  streak++; renderHud(); save();
+  if (streak % 100 === 0) fireConfetti(streak);
+}
+function miss() { streak = 0; xp = Math.max(0, xp - 15); renderHud(); save(); }
+
+function switchTab(tab) {
+  ['xray', 'quiz', 'vocab', 'speaking'].forEach(t => {
+    const viewEl = document.getElementById('view-' + t);
+    const tabEl = document.getElementById('tab-' + t);
+    if (viewEl) viewEl.classList.toggle('hidden', t !== tab);
+    if (tabEl) {
+      tabEl.setAttribute('aria-pressed', t === tab ? 'true' : 'false');
+      tabEl.className = t === tab
+        ? 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 text-white'
+        : 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+    }
+  });
+  if (tab === 'speaking') renderSpeaking();
+}
+
+// --- TAB 1: XRAY ---
+function renderXray() {
+  t0 = Date.now(); const it = XRAY[xIdx];
+  document.getElementById('xray-counter').textContent = `Ca ${xIdx + 1} / ${XRAY.length} · ${it.u}`;
+  const box = document.getElementById('xray-sentence-box'); box.innerHTML = '';
+  it.p.forEach((p, i) => {
+    if (p.b) {
+      const sp = document.createElement('span');
+      sp.className = xDone[xIdx]
+        ? 'inline-block px-3 py-0.5 mx-1 rounded-lg bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-bold'
+        : 'xray-blank inline-block px-3 py-0.5 mx-1 rounded-lg bg-blue-500/20 border border-blue-400 text-blue-300 font-bold';
+      sp.textContent = (xDone[xIdx] || '').replace(/\s*\([^)]*\)$/, '') || '[ ____ ]';
+      box.appendChild(sp);
+    } else if (p.s) {
+      const b = document.createElement('button'); b.type = 'button';
+      b.className = `inline-block px-2 py-0.5 mx-0.5 rounded-lg font-semibold ${xClue === i ? 'bg-amber-400 text-slate-950' : 'bg-amber-400/20 text-amber-300 border border-amber-400/50'}`;
+      b.textContent = p.t; b.onclick = () => { xClue = i; renderXray(); };
+      box.appendChild(b);
+    } else box.appendChild(document.createTextNode(p.t));
+  });
+  const bp = it.p.find(p => p.b), ap = xClue !== null ? it.p[xClue] : it.p.find(p => p.s);
+  document.getElementById('xray-analysis').innerHTML = `<div class="text-xs font-bold text-blue-700 dark:text-blue-300">🔍 Tín hiệu: "${ap.t}"</div><div class="text-sm mt-1 mb-3">${ap.c}</div><div class="flex flex-wrap gap-2">${bp.o.map(o => `<button type="button" onclick="chkX('${o.replace(/'/g, "\\'")}')" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border ${xDone[xIdx] === o || xDone[xIdx] === o.replace(/\s*\([^)]*\)$/, '') ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700'}">${o}</button>`).join('')}</div>${xDone[xIdx] ? `<div class="mt-3 text-xs sm:text-sm text-emerald-700 dark:text-emerald-300 font-medium">✅ ${it.m}</div>` : ''}`;
+}
+function chkX(o) {
+  const ans = XRAY[xIdx].p.find(p => p.b).a; const clean = o.replace(/\s*\([^)]*\)$/, '');
+  if (o === ans || clean === ans) { if (!xDone[xIdx]) { xDone[xIdx] = clean; score(15); } renderXray(); }
+  else { miss(); const a = document.getElementById('xray-analysis'); a.classList.remove('shake'); void a.offsetWidth; a.classList.add('shake'); }
+}
+function nextXray(d) { xIdx = (xIdx + d + XRAY.length) % XRAY.length; xClue = null; save(); renderXray(); }
+
+// --- TAB 2: QUIZ, ECG & CONFETTI ---
+const WEAK_LIMIT = 5, CLEAR_AFTER = 40, WIN_SIZE = 50, WIN_BAD = 25, WIN_GOOD = 40;
+function catOf(tag) {
+  const t = (tag || '').toLowerCase();
+  if (/danh từ|mạo từ|người|-itis/.test(t)) return 'Danh từ (N)';
+  if (/tính từ|-ed|-ing|linking/.test(t)) return 'Tính từ (Adj)';
+  if (/trạng từ/.test(t)) return 'Trạng từ (Adv)';
+  if (/thì|hiện tại|quá khứ|tương lai|hoàn thành|động từ/.test(t)) return 'Thì động từ';
+  if (/cấu trúc|require|it is|điều kiện|while|bẫy/.test(t)) return 'Bẫy cấu trúc';
+  return tag;
+}
+function isTagActive(c) { return !!reviewFlag[c] && (qCounter - (lastWrongAt[c] || 0)) < CLEAR_AFTER; }
+function recordWrong(q) {
+  const c = catOf(q.t);
+  errTotals[c] = (errTotals[c] || 0) + 1;
+  lastWrongAt[c] = qCounter + 1;
+  winTags[c] = (winTags[c] || 0) + 1;
+  if (errTotals[c] > WEAK_LIMIT) reviewFlag[c] = true;
+  save();
+}
+function recordResolved(firstTry) {
+  qCounter++; winTotal++; if (firstTry) winOk++;
+  if (winTotal >= WIN_SIZE) {
+    const snap = { total: winTotal, ok: winOk, tags: { ...winTags } };
+    winTotal = 0; winOk = 0; winTags = {};
+    setTimeout(() => showEcg(snap), 650);
+  }
+  save();
+}
+function startRemedial(arg) {
+  const cats = Array.isArray(arg) && arg.length ? arg : Object.keys(reviewFlag).filter(isTagActive);
+  if (!cats.length) return;
+  clearAutoTimer();
+  pool.forEach((item, idx) => { if (quizHistory[idx]?.done) { if (item.id) masteredQs[item.id] = true; markSeen(item.q); } });
+  const unseenBase = QUIZ.map((r, i) => ({ r, id: 'base_' + i })).filter(x => !masteredQs[x.id] && !isSeen(x.r.q) && cats.includes(catOf(x.r.t))).map(x => makeQ({ ...x.r, id: x.id }));
+  const autoGen = produceUniqueGenerated(Math.max(10, 22 - unseenBase.length), cats);
+  pool = shuf([...unseenBase, ...autoGen]);
+  qIdx = 0; quizHistory = {}; save(); switchTab('quiz'); renderQuiz();
+}
+function showEcg(snap) {
+  if (snap.ok > WIN_GOOD) return;
+  clearAutoTimer();
+  const bad = snap.ok <= WIN_BAD;
+  const m = document.getElementById('ecg-modal'), badge = document.getElementById('ecg-rate-badge'), body = document.getElementById('ecg-summary-body');
+  if (!m || !badge || !body) return;
+  badge.textContent = `${snap.ok}/${snap.total} đúng`;
+  const rows = Object.entries(snap.tags).sort((a, b) => b[1] - a[1]);
+  const mx = rows.length ? rows[0][1] : 1;
+  const weakKeys = rows.map(r => r[0]);
+  body.innerHTML = `
+    <div class="text-sm font-bold ${bad ? 'text-rose-400' : 'text-amber-300'}">${bad ? '💀 Nhịp tim ngừng đập — Cần ôn tập trung ngay!' : '⚠️ Nhịp học giảm tốc — Cần củng cố thêm'}</div>
+    <div class="text-xs text-slate-300">Tỷ lệ đúng ngay lần đầu: <b>${snap.ok}/${snap.total}</b> câu. Các chuyên đề sai nhiều nhất:</div>
+    <div class="space-y-2">${rows.length ? rows.map(([c, n]) => `<div><div class="flex justify-between text-xs mb-1"><span class="font-semibold text-slate-200">${c}</span><span class="text-rose-400">sai ${n} lần</span></div><div class="h-2 rounded bg-slate-800"><div class="h-2 rounded bg-rose-500" style="width:${Math.round(n / mx * 100)}%"></div></div></div>`).join('') : '<div class="text-xs text-slate-400">Chưa ghi nhận lỗi tập trung.</div>'}</div>
+    <div class="flex gap-2 pt-2">
+      <button type="button" onclick="closeEcgModal('drill', ${JSON.stringify(weakKeys).replace(/"/g, '&quot;')})" class="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold">🎯 Ôn tập trung ngay</button>
+      <button type="button" onclick="closeEcgModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">Đóng</button>
+    </div>`;
+  m.classList.remove('hidden');
+}
+function closeEcgModal(mode, cats) {
+  const m = document.getElementById('ecg-modal');
+  if (m) m.classList.add('hidden');
+  if (mode === 'drill' && Array.isArray(cats) && cats.length) { startRemedial(cats); return; }
+  if (qAns && autoNext && !document.getElementById('view-quiz').classList.contains('hidden')) nextQuiz();
+}
+function fireConfetti(n) {
+  const cv = document.getElementById('confetti-canvas'); if (!cv) return;
+  cv.classList.remove('hidden');
+  const W = cv.width = innerWidth, H = cv.height = innerHeight, ctx = cv.getContext('2d');
+  const cols = ['#f43f5e', '#f59e0b', '#10b981', '#3b82f6', '#a855f7', '#eab308'];
+  const ps = [];
+  for (let i = 0; i < 180; i++) { const left = i % 2 === 0; ps.push({ x: left ? 0 : W, y: H * .75, vx: (left ? 1 : -1) * (4 + Math.random() * 9), vy: -(9 + Math.random() * 10), s: 6 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: cols[i % cols.length] }); }
+  const b = document.createElement('div');
+  b.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-2xl bg-amber-400 text-slate-900 font-bold shadow-lg';
+  b.textContent = '🎉 Chuỗi ' + n + ' câu liên tiếp!';
+  document.body.appendChild(b); setTimeout(() => b.remove(), 3500);
+  const t0 = performance.now();
+  const step = now => {
+    ctx.clearRect(0, 0, W, H);
+    ps.forEach(p => { p.vy += .28; p.vx *= .992; p.x += p.vx; p.y += p.vy; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore(); });
+    if (now - t0 < 4500) requestAnimationFrame(step); else { ctx.clearRect(0, 0, W, H); cv.classList.add('hidden'); }
+  };
+  requestAnimationFrame(step);
+}
+function getSortedWeakTags() {
+  return Object.entries(weakTags).filter(([, cnt]) => cnt > 0).sort((a, b) => b[1] - a[1]);
+}
+function renderWeakPanel() {
+  const box = document.getElementById('weak-structure-box'); if (!box) return;
+  const top = getSortedWeakTags().slice(0, 3);
+  const remedialRows = Object.keys(reviewFlag).filter(c => reviewFlag[c]).map(c => ({ c, n: errTotals[c] || 0, act: isTagActive(c), left: Math.max(0, CLEAR_AFTER - (qCounter - (lastWrongAt[c] || 0))) }));
+  if (!top.length && !remedialRows.length) {
+    box.classList.add('hidden');
+    return;
+  }
+  box.classList.remove('hidden');
+  const anyRemedial = remedialRows.some(r => r.act);
+  box.innerHTML = `
+    <div class="flex flex-wrap items-center gap-1.5">
+      ${top.length ? `<span class="font-bold text-rose-700 dark:text-rose-300">⚠️ Hay sai:</span>${top.map(([tag, cnt]) => `<span class="px-2 py-0.5 rounded-md bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-200 font-semibold">${tag} (${cnt})</span>`).join('')}` : ''}
+      ${remedialRows.map(r => r.act ? `<span class="px-2 py-0.5 rounded-md bg-violet-100 dark:bg-violet-900/60 text-violet-800 dark:text-violet-200 font-semibold">🧠 ${r.c} (còn ${r.left} câu)</span>` : `<span class="px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-400 line-through">${r.c}</span>`).join('')}
+    </div>
+    <div class="flex flex-wrap gap-1.5">
+      ${top.length ? `<button type="button" onclick="generateTargetedQuiz()" class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold">🎯 Luyện phần hay sai</button>` : ''}
+      ${remedialRows.length ? `<button type="button" ${anyRemedial ? 'onclick="startRemedial()"' : 'disabled'} class="px-2.5 py-1 rounded-lg font-semibold ${anyRemedial ? 'bg-violet-600 hover:bg-violet-700 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-400 cursor-not-allowed'}">${anyRemedial ? '💉 Bổ túc câu ngu' : '✔ Đã vững'}</button>` : ''}
+    </div>`;
+}
+function pickGenByTag(tag) {
+  const t = (tag || '').toLowerCase();
+  if (t.includes('danh từ') || t.includes('mạo từ') || t.includes('người') || t.includes('-itis')) return GENS[0]();
+  if (t.includes('tính từ') || t.includes('-ed') || t.includes('-ing') || t.includes('linking')) return GENS[1]();
+  if (t.includes('trạng từ')) return GENS[2]();
+  if (t.includes('thì') || t.includes('hoàn thành') || t.includes('quá khứ') || t.includes('tương lai')) return GENS[3]();
+  if (t.includes('require') || t.includes('it is') || t.includes('điều kiện') || t.includes('while') || t.includes('cấu trúc')) return GENS[4]();
+  return GENS[Math.floor(Math.random() * GENS.length)]();
+}
+function produceUniqueGenerated(count, targetTags = []) {
+  const out = [], localUsed = new Set();
+  let guard = 0;
+  while (out.length < count && guard < 400) {
+    guard++;
+    const chosenTag = targetTags.length ? targetTags[out.length % targetTags.length] : '';
+    const raw = pickGenByTag(chosenTag);
+    if (chosenTag) raw.t = chosenTag;
+    const key = qKey(raw.q);
+    if (isSeen(raw.q) || localUsed.has(key)) continue;
+    localUsed.add(key);
+    out.push(makeQ(raw));
+  }
+  return out;
+}
+function generateTargetedQuiz() {
+  clearAutoTimer();
+  pool.forEach((item, idx) => { if (quizHistory[idx]?.done) { if (item.id) masteredQs[item.id] = true; markSeen(item.q); } });
+  const weakList = getSortedWeakTags();
+  const targetTags = weakList.map(([tag]) => tag);
+  const unseenBase = QUIZ.map((r, i) => ({ r, id: 'base_' + i }))
+    .filter(x => !masteredQs[x.id] && !isSeen(x.r.q) && (!targetTags.length || targetTags.includes(x.r.t)))
+    .map(x => makeQ({ ...x.r, id: x.id }));
+  const needGen = Math.max(8, 22 - unseenBase.length);
+  const autoGen = produceUniqueGenerated(needGen, targetTags);
+  pool = shuf([...unseenBase, ...autoGen]);
+  qIdx = 0; quizHistory = {}; save(); renderQuiz();
+}
+function generateOpenQuizBatch(pruneCompleted = true) {
+  clearAutoTimer();
+  if (pruneCompleted) {
+    pool.forEach((item, idx) => { if (quizHistory[idx]?.done) { if (item.id) masteredQs[item.id] = true; markSeen(item.q); } });
+  }
+  const unseenBase = QUIZ.map((r, i) => ({ r, id: 'base_' + i }))
+    .filter(x => !masteredQs[x.id] && !isSeen(x.r.q))
+    .map(x => makeQ({ ...x.r, id: x.id }));
+  const weakList = getSortedWeakTags();
+  const targetTags = weakList.map(([tag]) => tag);
+  const needGen = Math.max(8, 22 - unseenBase.length);
+  const autoGen = produceUniqueGenerated(needGen, targetTags);
+  pool = shuf([...unseenBase, ...autoGen]);
+  qIdx = 0; quizHistory = {}; save(); renderQuiz();
+}
+function isQuizUnlocked(idx) {
+  return idx === qIdx || !!quizHistory[idx]?.done || (quizHistory[idx]?.wrongIndices || []).length > 0;
+}
+function jumpToQuiz(idx) {
+  if (idx < 0 || idx >= pool.length || !isQuizUnlocked(idx)) return;
+  clearAutoTimer(); closeQuizPicker(); qIdx = idx; save(); renderQuiz();
+}
+function toggleQuizPicker() {
+  const menu = document.getElementById('quiz-picker-menu');
+  const btn = document.getElementById('quiz-picker-btn');
+  if (menu) {
+    const isHidden = menu.classList.toggle('hidden');
+    if (btn) btn.setAttribute('aria-expanded', !isHidden ? 'true' : 'false');
+  }
+}
+function closeQuizPicker() {
+  const menu = document.getElementById('quiz-picker-menu');
+  const btn = document.getElementById('quiz-picker-btn');
+  if (menu) menu.classList.add('hidden');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+function renderQuiz() {
+  clearAutoTimer(); renderAutoNextBtn(); renderAutoRenewBtn(); renderWeakPanel();
+  if (!pool.length) generateOpenQuizBatch(false);
+  if (qIdx >= pool.length) qIdx = 0;
+  const q = pool[qIdx];
+  markSeen(q.q);
+  const hist = quizHistory[qIdx] || { done: false, wrongIndices: [] };
+  qAns = !!hist.done;
+  t0 = Date.now();
+  document.getElementById('quiz-tag').textContent = q.t;
+  document.getElementById('quiz-progress').textContent = `Câu ${qIdx + 1} / ${pool.length}`;
+  document.getElementById('quiz-question').innerHTML = q.q.replace('_______', '<span class="px-3 py-0.5 mx-1 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold">_______</span>');
+  const hb = document.getElementById('quiz-hint-box'); hb.classList.add('hidden'); hb.textContent = '💡 Gợi ý: ' + q.h;
+  const fb = document.getElementById('quiz-feedback');
+  const nextBtn = document.getElementById('quiz-next-btn');
+  const prevBtn = document.getElementById('quiz-prev-btn');
+  if (prevBtn) prevBtn.disabled = (qIdx === 0);
+  const pickerLabel = document.getElementById('quiz-picker-label');
+  if (pickerLabel) pickerLabel.textContent = `${qIdx + 1}/${pool.length}`;
+  const pillsEl = document.getElementById('quiz-nav-pills');
+  if (pillsEl) {
+    pillsEl.innerHTML = pool.map((_, idx) => {
+      const isCur = idx === qIdx;
+      const isDone = !!quizHistory[idx]?.done;
+      const hasErr = (quizHistory[idx]?.wrongIndices || []).length > 0 && !isDone;
+      const unlocked = isCur || isDone || hasErr;
+      const cls = isCur
+        ? 'h-8 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm'
+        : isDone
+          ? 'h-8 rounded-lg text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+          : hasErr
+            ? 'h-8 rounded-lg text-xs font-semibold bg-rose-100 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
+            : 'h-8 rounded-lg text-xs font-medium bg-slate-100/60 dark:bg-slate-800/40 text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-55';
+      return `<button type="button" ${unlocked ? `onclick="jumpToQuiz(${idx})"` : 'disabled'} class="${cls}">${idx + 1}</button>`;
+    }).join('');
+  }
+  const el = document.getElementById('quiz-options'); el.innerHTML = '';
+  q.o.forEach((opt, i) => {
+    const b = document.createElement('button'); b.type = 'button';
+    const isWrong = (hist.wrongIndices || []).includes(i);
+    if (hist.done && i === q.a) {
+      b.className = 'p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 text-left text-sm font-semibold flex items-center gap-2.5';
+      b.disabled = true;
+    } else if (isWrong) {
+      b.className = 'p-3.5 rounded-xl border border-rose-300 bg-rose-50 dark:bg-rose-950/40 text-rose-700 text-left text-sm opacity-75 flex items-center gap-2.5';
+      b.disabled = true;
+    } else {
+      b.className = 'p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-left text-sm font-medium flex items-center gap-2.5';
+      b.disabled = hist.done;
+    }
+    b.innerHTML = `<span class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-700 text-xs font-bold flex items-center justify-center shrink-0">${['A', 'B', 'C', 'D'][i]}</span><span>${opt}</span>`;
+    b.onclick = () => ansQ(i, b);
+    el.appendChild(b);
+  });
+  if (hist.done) {
+    fb.className = 'p-4 rounded-xl text-sm mb-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 text-emerald-800 dark:text-emerald-200';
+    fb.textContent = '✅ ' + q.e;
+    fb.classList.remove('hidden');
+    nextBtn.textContent = (qIdx === pool.length - 1 && !autoRenew)
+      ? '🎉 Đã hoàn thành bộ đề · Bấm tạo đề mới'
+      : (qIdx === pool.length - 1) ? '🎉 Hoàn thành & Tạo đề mới →' : 'Ca tiếp theo →';
+    nextBtn.classList.remove('hidden');
+  } else if ((hist.wrongIndices || []).length) {
+    fb.className = 'p-3 rounded-xl text-xs sm:text-sm mb-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 text-rose-700';
+    fb.textContent = '❌ Chưa chính xác! Xem gợi ý và chọn lại nhé.';
+    fb.classList.remove('hidden');
+    nextBtn.classList.add('hidden');
+  } else {
+    fb.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+  }
+}
+function ansQ(i, b) {
+  if (qAns) return; const q = pool[qIdx], fb = document.getElementById('quiz-feedback'), nextBtn = document.getElementById('quiz-next-btn');
+  if (!quizHistory[qIdx]) quizHistory[qIdx] = { done: false, wrongIndices: [] };
+  if (i === q.a) {
+    qAns = true; quizHistory[qIdx].done = true;
+    if (q.id) masteredQs[q.id] = true;
+    markSeen(q.q);
+    if (weakTags[q.t] > 0) weakTags[q.t] = Math.max(0, weakTags[q.t] - 1);
+    b.className = 'p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 text-left text-sm font-semibold flex items-center gap-2.5';
+    const isLast = (qIdx === pool.length - 1);
+    fb.className = 'p-4 rounded-xl text-sm mb-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 text-emerald-800 dark:text-emerald-200';
+    fb.textContent = '✅ ' + q.e; fb.classList.remove('hidden');
+    nextBtn.textContent = isLast ? '🎉 Hoàn thành & Tạo đề mới →' : 'Ca tiếp theo →';
+    nextBtn.classList.remove('hidden');
+    score(20);
+    recordResolved(!quizHistory[qIdx].wrongIndices.length);
+    renderWeakPanel();
+    document.querySelectorAll('#quiz-options button').forEach(x => x.disabled = true);
+    if (isLast) {
+      if (autoRenew) { autoTimer = setTimeout(() => generateOpenQuizBatch(true), 950); }
+    } else if (autoNext) {
+      autoTimer = setTimeout(() => nextQuiz(), 850);
+    }
+  } else {
+    if (!quizHistory[qIdx].wrongIndices.length) recordWrong(q);
+    if (!quizHistory[qIdx].wrongIndices.includes(i)) quizHistory[qIdx].wrongIndices.push(i);
+    weakTags[q.t] = (weakTags[q.t] || 0) + 1;
+    miss(); renderWeakPanel();
+    b.disabled = true; b.className = 'p-3.5 rounded-xl border border-rose-300 bg-rose-50 dark:bg-rose-950/40 text-rose-700 text-left text-sm opacity-75 shake flex items-center gap-2.5';
+    fb.className = 'p-3 rounded-xl text-xs sm:text-sm mb-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 text-rose-700';
+    fb.textContent = '❌ Chưa chính xác! Xem gợi ý và chọn lại nhé.';
+    fb.classList.remove('hidden');
+  }
+}
+function prevQuiz() { if (qIdx <= 0) return; clearAutoTimer(); qIdx--; save(); renderQuiz(); }
+function nextQuiz() {
+  clearAutoTimer();
+  if (qIdx >= pool.length - 1) { generateOpenQuizBatch(true); return; }
+  qIdx++; save(); renderQuiz();
+}
+
+// --- TAB 3: VOCAB & SPEECH ---
+function speak(t, el, rate = 0.92) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const cleanEn = t
+    .replace(/\([^)]*\)/g, '')
+    .replace(/^[-–—]+|[-–—]+$/g, '')
+    .replace(/[\u00C0-\u1EF9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!cleanEn) return;
+  const u = new SpeechSynthesisUtterance(cleanEn);
+  u.lang = 'en-US'; u.rate = rate;
+  if (el) { el.classList.add('ring-2', 'ring-blue-500'); u.onend = u.onerror = () => el.classList.remove('ring-2', 'ring-blue-500'); }
+  window.speechSynthesis.speak(u);
+}
+function filterVocab(type) {
+  vFilt = type; save();
+  document.querySelectorAll('.v-filter').forEach(b => {
+    const m = b.dataset.type === type;
+    b.className = b.dataset.type === 'TRAP'
+      ? (m ? 'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-600 text-white' : 'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 dark:bg-rose-950/50 text-rose-600 border border-rose-200 dark:border-rose-800')
+      : b.dataset.type === 'SURG'
+        ? (m ? 'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-600 text-white' : 'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-50 dark:bg-teal-950/50 text-teal-700 border border-teal-200 dark:border-teal-800')
+        : (m ? 'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 dark:bg-slate-700 text-white' : 'v-filter px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800');
+  });
+  const bc = { N: 'bg-blue-100 text-blue-700', J: 'bg-emerald-100 text-emerald-700', A: 'bg-amber-100 text-amber-700', V: 'bg-purple-100 text-purple-700', SURG: 'bg-teal-100 text-teal-700', TRAP: 'bg-rose-100 text-rose-700' };
+  const list = type === 'ALL' ? VOCAB : VOCAB.filter(x => x.y === type);
+  document.getElementById('vocab-grid').innerHTML = list.map(it => {
+    const isStatic = (it.y === 'SURG' || it.y === 'TRAP');
+    const itemsHtml = it.w.split(/\s*,\s*/).filter(Boolean).map(p => {
+      const m = p.match(/^([^(]+)(\([^)]+\))?$/);
+      const label = `${m ? m[1].trim() : p}${m && m[2] ? ` <span class="text-slate-500 font-normal">${m[2]}</span>` : ''}`;
+      if (isStatic) return `<span class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left">${label}</span>`;
+      return `<button type="button" onclick="speak('${p.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}', this)" class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left">🔊 ${label}</button>`;
+    }).join('');
+    return `<div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between"><div><div class="flex justify-between gap-2 mb-3"><span class="text-xs font-bold px-2.5 py-1 rounded-lg ${bc[it.y]}">${it.s}</span>${isStatic ? '' : '<span class="text-xs text-slate-400">👆 Chạm để nghe</span>'}</div><div class="flex flex-wrap gap-1.5 mb-3">${itemsHtml}</div></div><div class="text-xs text-slate-500 pt-2.5 border-t border-slate-100 dark:border-slate-800">📌 ${it.r}</div></div>`;
+  }).join('');
+}
+
+// --- TAB 4: KHO SPEAKING ---
+function updateSpeakingCounts() {
+  const total = SPEAKING_UNITS.length;
+  const clinic = SPEAKING_UNITS.filter(u => u.cat === 'CLINIC').length;
+  const staff = SPEAKING_UNITS.filter(u => u.cat === 'STAFF').length;
+  ['spk-total-count', 'spk-cheat-count', 'spk-cnt-all', 'guide-spk-count'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.textContent = total;
+  });
+  const cEl = document.getElementById('spk-cnt-clinic'); if (cEl) cEl.textContent = clinic;
+  const sEl = document.getElementById('spk-cnt-staff'); if (sEl) sEl.textContent = staff;
+  const pbEl = document.getElementById('phrasebook-count'); if (pbEl) pbEl.textContent = Object.keys(phrasebook).length;
+}
+function setSpeakingFilter(f) {
+  spkFilter = f;
+  document.querySelectorAll('.s-filt').forEach(b => {
+    const active = b.dataset.sfilt === f;
+    b.className = active
+      ? 's-filt px-3 py-1 rounded-lg text-xs font-semibold bg-slate-900 dark:bg-blue-600 text-white'
+      : 's-filt px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+  });
+  const list = f === 'ALL' ? SPEAKING_UNITS : SPEAKING_UNITS.filter(u => u.cat === f);
+  if (list.length && !list.some(u => u.id === spkUnitId)) spkUnitId = list[0].id;
+  renderSpeaking();
+}
+function selectSpeakingUnit(id) { spkUnitId = id; renderSpeaking(); }
+function randomSpeakingCard() {
+  const list = spkFilter === 'ALL' ? SPEAKING_UNITS : SPEAKING_UNITS.filter(u => u.cat === spkFilter);
+  if (!list.length) return;
+  const pick = list[Math.floor(Math.random() * list.length)];
+  spkUnitId = pick.id; renderSpeaking();
+}
+function setSpeakingRole(role) {
+  spkRole = role;
+  document.getElementById('role-btn-A').className = role === 'A' ? 'px-3 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white' : 'px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+  document.getElementById('role-btn-B').className = role === 'B' ? 'px-3 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white' : 'px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+  renderSpeaking();
+}
+function setSpeakingMask(m) {
+  spkMask = m;
+  document.querySelectorAll('.s-mask').forEach(b => {
+    const active = Number(b.dataset.smask) === m;
+    b.className = active
+      ? 's-mask px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white'
+      : 's-mask px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+  });
+  renderSpeaking();
+}
+function togglePanicPanel(type) {
+  const box = document.getElementById('spk-panic-box'); if (!box) return;
+  if (spkPanic === type && !box.classList.contains('hidden')) {
+    box.classList.add('hidden'); spkPanic = ''; return;
+  }
+  spkPanic = type;
+  const unit = SPEAKING_UNITS.find(u => u.id === spkUnitId) || SPEAKING_UNITS[0];
+  if (type === 'radar') {
+    box.innerHTML = `<div class="font-bold text-amber-700 dark:text-amber-300 mb-1">🧭 Flow Radar 3 bước (${unit.code}):</div>` + unit.radar.map(r => `<div>• ${r}</div>`).join('');
+  } else if (type === 'a1') {
+    box.innerHTML = `<div class="font-bold text-teal-700 dark:text-teal-300 mb-1">🔄 Từ thay thế cấp độ A1 khi bí từ chuyên ngành:</div>` + unit.a1.map(r => `<div>• <b>${r}</b></div>`).join('');
+  } else {
+    box.innerHTML = `<div class="font-bold text-purple-700 dark:text-purple-300 mb-1">💬 Cụm câu giờ & hỏi ngược tự nhiên:</div>
+      <div>• Câu giờ suy nghĩ: <i>"Let me see...", "Well, actually...", "That's a good question..."</i></div>
+      <div>• Hỏi ngược kéo hội thoại (Vai B): <i>"What does it involve?", "Can it be treated?", "What happens if...?"</i></div>`;
+  }
+  box.classList.remove('hidden');
+}
+function formatMaskedText(text, kws) {
+  if (spkMask === 0) return text;
+  if (spkMask === 2) return '•••• •••• •••• (Tự nói theo gợi ý nhiệm vụ bên dưới)';
+  const words = text.split(/\s+/);
+  return words.map(w => {
+    const clean = w.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
+    const keep = kws.some(k => k.toLowerCase().split(/\s+/).includes(clean));
+    return keep ? `<span class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 font-bold">${w}</span>` : '___';
+  }).join(' ');
+}
+function checkImprovisation(unitId, lineIdx) {
+  const inp = document.getElementById(`imp-inp-${unitId}-${lineIdx}`);
+  const res = document.getElementById(`imp-res-${unitId}-${lineIdx}`);
+  if (!inp || !res) return;
+  const val = (inp.value || '').trim();
+  if (!val) { res.innerHTML = '<span class="text-amber-600">Hãy gõ hoặc bấm 🎤 nói câu ứng biến của bạn trước nhé.</span>'; return; }
+  const unit = SPEAKING_UNITS.find(u => u.id === unitId);
+  const line = unit?.lines[lineIdx];
+  if (!line) return;
+  const low = val.toLowerCase();
+  const matched = line.kw.filter(k => low.includes(k.toLowerCase()));
+  const pbKey = `${unitId}_${lineIdx}`;
+  phrasebook[pbKey] = { unitCode: unit.code, unitTitle: unit.title, role: line.r, task: line.task, text: val, sample: line.en };
+  save(); updateSpeakingCounts();
+  if (matched.length > 0) {
+    res.innerHTML = `<span class="text-emerald-600 dark:text-emerald-400 font-semibold">✅ Đạt yêu cầu truyền đạt! (Bật từ khóa: ${matched.join(', ')}) · Đã lưu vào Sổ tay câu tủ.</span>`;
+  } else {
+    res.innerHTML = `<span class="text-blue-600 dark:text-blue-400 font-semibold">💾 Đã lưu câu của bạn vào Sổ tay! Gợi ý thêm từ khóa lõi (${line.kw.join(', ')}) để đủ ý nhất.</span>`;
+  }
+}
+function startVoiceInput(unitId, lineIdx) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const res = document.getElementById(`imp-res-${unitId}-${lineIdx}`);
+  if (!SR) {
+    if (res) res.innerHTML = '<span class="text-rose-500">Trình duyệt này chưa hỗ trợ nhận diện giọng nói. Bạn có thể gõ trực tiếp vào ô nhé!</span>';
+    return;
+  }
+  const rec = new SR();
+  rec.lang = 'en-US'; rec.interimResults = false;
+  if (res) res.innerHTML = '<span class="text-blue-600 animate-pulse">🎙️ Đang nghe giọng nói tiếng Anh của bạn...</span>';
+  rec.onresult = e => {
+    const transcript = e.results[0][0].transcript;
+    const inp = document.getElementById(`imp-inp-${unitId}-${lineIdx}`);
+    if (inp) inp.value = transcript;
+    checkImprovisation(unitId, lineIdx);
+  };
+  rec.onerror = () => { if (res) res.innerHTML = '<span class="text-rose-500">Không nghe rõ, hãy thử lại hoặc gõ trực tiếp vào ô.</span>'; };
+  rec.start();
+}
+function playFullDialogue() {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const unit = SPEAKING_UNITS.find(u => u.id === spkUnitId) || SPEAKING_UNITS[0];
+  unit.lines.forEach(l => {
+    const u = new SpeechSynthesisUtterance(l.en);
+    u.lang = 'en-US'; u.rate = 0.94;
+    window.speechSynthesis.speak(u);
+  });
+}
+function openPhrasebookModal() {
+  const listEl = document.getElementById('phrasebook-list');
+  const entries = Object.entries(phrasebook);
+  if (!entries.length) {
+    listEl.innerHTML = '<div class="text-xs text-slate-500 p-4 rounded-xl bg-slate-50 dark:bg-slate-800 text-center">Chưa có câu tủ nào. Hãy nhập hoặc nói thử câu ứng biến ở vai bạn chọn để tự động lưu vào đây!</div>';
+  } else {
+    listEl.innerHTML = entries.map(([k, v]) => `
+      <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
+        <div class="flex items-center justify-between gap-2">
+          <span class="font-bold text-blue-600 dark:text-blue-400">${v.unitCode} · Vai ${v.role}</span>
+          <button type="button" onclick="delete phrasebook['${k}'];save();updateSpeakingCounts();openPhrasebookModal();" class="text-slate-400 hover:text-rose-500">Xóa</button>
+        </div>
+        <div class="text-slate-500">Nhiệm vụ: ${v.task}</div>
+        <div class="font-semibold text-slate-900 dark:text-slate-100">🗣️ Câu của bạn: "${v.text}"</div>
+        <div class="text-slate-400">Mẫu tham khảo: <i>"${v.sample}"</i></div>
+      </div>`).join('');
+  }
+  document.getElementById('phrasebook-modal').classList.remove('hidden');
+}
+function renderSpeaking() {
+  updateSpeakingCounts();
+  const cheatEl = document.getElementById('spk-13-keywords');
+  if (cheatEl) {
+    cheatEl.innerHTML = SPEAKING_UNITS.map(u => `<div class="py-0.5 border-b border-slate-100 dark:border-slate-800 last:border-0"><b>${u.code} (${u.title.split('(')[0].trim()}):</b> <span class="text-slate-600 dark:text-slate-300">${u.kw3.join(' → ')}</span></div>`).join('');
+  }
+  const list = spkFilter === 'ALL' ? SPEAKING_UNITS : SPEAKING_UNITS.filter(u => u.cat === spkFilter);
+  const unitListEl = document.getElementById('spk-unit-list');
+  if (unitListEl) {
+    unitListEl.innerHTML = list.map(u => `
+      <button type="button" onclick="selectSpeakingUnit('${u.id}')" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition ${u.id === spkUnitId ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-blue-400'}">
+        ${u.code}: ${u.title.split('(')[0].trim()}
+      </button>`).join('');
+  }
+  const unit = SPEAKING_UNITS.find(u => u.id === spkUnitId) || SPEAKING_UNITS[0];
+  const ctxEl = document.getElementById('spk-context-bar');
+  if (ctxEl) {
+    ctxEl.innerHTML = `
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-blue-600 text-white">${unit.code} · ${unit.title}</span>
+        <span class="text-xs font-medium text-slate-600 dark:text-slate-300">📍 ${unit.place}</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+        <div class="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-blue-200/70 dark:border-slate-700"><b>🅰️ Vai A:</b> ${unit.roleA}</div>
+        <div class="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-indigo-200/70 dark:border-slate-700"><b>🅱️ Vai B:</b> ${unit.roleB}</div>
+      </div>`;
+  }
+  const dlgEl = document.getElementById('spk-dialogue-box');
+  if (dlgEl) {
+    dlgEl.innerHTML = unit.lines.map((l, idx) => {
+      const isMyTurn = l.r === spkRole;
+      const savedTxt = phrasebook[`${unit.id}_${idx}`]?.text || '';
+      const displayEn = isMyTurn ? formatMaskedText(l.en, l.kw) : l.en;
+      return `
+        <div class="p-3.5 rounded-2xl border ${isMyTurn ? 'bg-blue-50/50 dark:bg-blue-950/25 border-blue-200 dark:border-blue-800/70' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800'} space-y-2">
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-lg text-xs font-bold ${l.r === 'A' ? 'bg-blue-600 text-white' : 'bg-emerald-600 text-white'}">Vai ${l.r}</span>
+              ${isMyTurn ? '<span class="text-xs font-semibold text-blue-600 dark:text-blue-400">🎯 Lượt của bạn</span>' : ''}
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button type="button" onclick="speak('${l.en.replace(/'/g, "\\'")}', this, 0.95)" aria-label="Nghe tốc độ chuẩn" class="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">🔊 1x</button>
+              <button type="button" onclick="speak('${l.en.replace(/'/g, "\\'")}', this, 0.72)" aria-label="Nghe tốc độ chậm" class="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">🐢 0.7x</button>
+            </div>
+          </div>
+          <div class="spk-selectable text-sm sm:text-base font-medium leading-relaxed text-slate-900 dark:text-slate-100">${displayEn}</div>
+          <div class="text-xs text-slate-500 dark:text-slate-400">${l.vi}</div>
+          ${isMyTurn ? `
+            <div class="pt-2 border-t border-blue-200/60 dark:border-slate-700/70 space-y-1.5">
+              <div class="text-xs font-semibold text-amber-700 dark:text-amber-300">📌 Nhiệm vụ: ${l.task} <span class="text-slate-400 font-normal">(Từ khóa: ${l.kw.join(', ')})</span></div>
+              <div class="flex flex-wrap gap-1.5">
+                <input id="imp-inp-${unit.id}-${idx}" type="text" value="${savedTxt.replace(/"/g, '&quot;')}" placeholder="Gõ hoặc bấm 🎤 nói cách ứng biến của bạn..." class="flex-1 min-w-[200px] px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none focus:border-blue-500">
+                <button type="button" onclick="startVoiceInput('${unit.id}', ${idx})" aria-label="Nói bằng micro" class="px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-semibold">🎤 Nói</button>
+                <button type="button" onclick="checkImprovisation('${unit.id}', ${idx})" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold">✓ Kiểm tra & Lưu tủ</button>
+              </div>
+              <div id="imp-res-${unit.id}-${idx}" class="text-xs"></div>
+            </div>` : ''}
+        </div>`;
+    }).join('');
+  }
+}
+
+// Highlight-to-Listen Toolbar
+function speakHighlighted(rate) {
+  if (!selectedHighlightText) return;
+  speak(selectedHighlightText, null, rate);
+}
+function speakHighlightedSlowWords() {
+  if (!selectedHighlightText || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  selectedHighlightText.split(/\s+/).filter(Boolean).forEach(w => {
+    const u = new SpeechSynthesisUtterance(w.replace(/[^a-zA-Z0-9'-]/g, ''));
+    u.lang = 'en-US'; u.rate = 0.72;
+    window.speechSynthesis.speak(u);
+  });
+}
+document.addEventListener('mouseup', () => {
+  const sel = window.getSelection();
+  const txt = (sel ? sel.toString() : '').trim();
+  const tb = document.getElementById('highlight-toolbar');
+  if (!tb) return;
+  if (txt && txt.length >= 2 && txt.length <= 160 && !document.getElementById('view-speaking')?.classList.contains('hidden')) {
+    selectedHighlightText = txt;
+    const rect = sel.getRangeAt(0).getBoundingClientRect();
+    tb.style.left = Math.max(12, Math.min(window.innerWidth - 260, rect.left)) + 'px';
+    tb.style.top = Math.max(12, rect.top - 46) + 'px';
+    tb.classList.remove('hidden');
+  } else {
+    tb.classList.add('hidden');
+  }
+});
+
+document.addEventListener('click', e => {
+  const menu = document.getElementById('quiz-picker-menu');
+  const btn = document.getElementById('quiz-picker-btn');
+  if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target) && (!btn || !btn.contains(e.target))) {
+    closeQuizPicker();
+  }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  load(); renderHud(); renderXray(); renderQuiz(); filterVocab(vFilt); renderSpeaking();
+  if (!safeGet(GUIDE_SEEN_KEY) && xp === 0) {
+    openGuideModal();
+  }
+});
+</script>
+</body>
+</html>
